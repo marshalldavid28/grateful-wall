@@ -98,10 +98,12 @@ const Admin = () => {
     try {
       setDeleteLoading(true);
       
+      console.log('Attempting to delete testimonial with ID:', id);
+      
       // Delete from Supabase
       await deleteTestimonial(id);
       
-      // Update local state
+      // Update local state (this actually shouldn't be necessary with realtime, but as a fallback)
       setUserTestimonials(prevTestimonials => 
         prevTestimonials.filter(testimonial => testimonial.id !== id)
       );

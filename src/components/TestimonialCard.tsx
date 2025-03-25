@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -25,9 +24,14 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    
     if (confirmDelete) {
-      onDelete?.(id);
+      console.log('Confirmed delete for testimonial ID:', id);
+      if (onDelete) {
+        onDelete(id);
+      }
       setConfirmDelete(false);
     } else {
       setConfirmDelete(true);
@@ -132,10 +136,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
 
         {isAdmin && onDelete && (
           <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteClick();
-            }}
+            onClick={handleDeleteClick}
             className={cn(
               "flex-shrink-0 transition-colors p-2 rounded-full",
               confirmDelete 

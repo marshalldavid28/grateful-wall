@@ -218,15 +218,20 @@ export const addTestimonial = async (
 // Function to delete a testimonial
 export const deleteTestimonial = async (id: string): Promise<void> => {
   try {
-    const { error } = await supabase
+    console.log('Deleting testimonial with ID:', id);
+    
+    const { error, count } = await supabase
       .from('testimonials')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select('count');
     
     if (error) {
       console.error('Error deleting testimonial from Supabase:', error);
       throw error;
     }
+    
+    console.log(`Successfully deleted ${count} testimonial(s) with ID: ${id}`);
   } catch (error) {
     console.error('Error in deleteTestimonial:', error);
     throw error;
