@@ -15,7 +15,6 @@ export interface Testimonial {
   imageUrl?: string;
   tags?: string[];
   type: 'written' | 'linkedin';
-  headline?: string;
   linkedinUrl?: string;
 }
 
@@ -45,7 +44,6 @@ const mapSupabaseRecordToTestimonial = (record: any): Testimonial => {
     imageUrl: record.image_url || undefined,
     tags: record.tags || undefined,
     type: record.type as 'written' | 'linkedin',
-    headline: record.headline || undefined,
     linkedinUrl: record.linkedin_url || undefined
   };
 };
@@ -64,7 +62,6 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
     image_url: testimonial.imageUrl,
     tags: testimonial.tags,
     type: testimonial.type,
-    headline: testimonial.headline,
     linkedin_url: testimonial.linkedinUrl
   };
 };

@@ -7,8 +7,6 @@ import { ImagePlus, X } from 'lucide-react';
 interface LinkedinTestimonialFormProps {
   name: string;
   setName: (value: string) => void;
-  headline: string;
-  setHeadline: (value: string) => void;
   linkedinUrl: string;
   setLinkedinUrl: (value: string) => void;
   preview: string | null;
@@ -19,8 +17,6 @@ interface LinkedinTestimonialFormProps {
 export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = ({
   name,
   setName,
-  headline,
-  setHeadline,
   linkedinUrl,
   setLinkedinUrl,
   preview,
@@ -36,18 +32,6 @@ export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = (
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="John Doe"
-          required
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="headline">Headline or Quote</Label>
-        <Input
-          id="headline"
-          value={headline}
-          onChange={(e) => setHeadline(e.target.value)}
-          placeholder="Add a headline for this testimonial"
           required
           className="mt-1"
         />

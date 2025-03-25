@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TestimonialType } from './TestimonialTypeSelector';
@@ -67,12 +66,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     
     onSubmit({
       name,
-      text,
+      text: testimonialType === 'linkedin' ? 'LinkedIn Testimonial' : text,
       company,
       role,
       image: image || undefined,
       type: testimonialType,
-      headline: testimonialType === 'linkedin' ? headline : undefined,
       linkedinUrl: testimonialType === 'linkedin' ? linkedinUrl : undefined
     });
   };
