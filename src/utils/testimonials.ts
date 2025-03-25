@@ -64,6 +64,16 @@ const defaultTestimonials: Testimonial[] = [
   }
 ];
 
+// Helper function to convert File to base64 string
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 // Helper function to serialize/deserialize Date objects for localStorage
 const serializeTestimonial = (testimonial: Testimonial): any => ({
   ...testimonial,
@@ -105,13 +115,34 @@ const saveTestimonials = (testimonials: Testimonial[]): void => {
 };
 
 // Function to add a new testimonial
-export const addTestimonial = (testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'>, currentTestimonials: Testimonial[] = []): Testimonial => {
+export const addTestimonial = async (
+  testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'> & { 
+    image?: File 
+  },
+  currentTestimonials: Testimonial[] = []
+): Promise<Testimonial> => {
   // Get existing testimonials first
   const testimonials = currentTestimonials.length ? currentTestimonials : getTestimonials();
+  
+  // Convert image to base64 if provided
+  let avatarUrl;
+  let imageUrl;
+  
+  if (testimonial.image) {
+    const base64Image = await fileToBase64(testimonial.image);
+    
+    if (testimonial.type === 'written') {
+      avatarUrl = base64Image;
+    } else if (testimonial.type === 'linkedin') {
+      imageUrl = base64Image;
+    }
+  }
   
   const newTestimonial: Testimonial = {
     id: uuidv4(),
     ...testimonial,
+    avatarUrl: avatarUrl || testimonial.avatarUrl,
+    imageUrl: imageUrl || testimonial.imageUrl,
     date: new Date(),
     verified: false,
   };

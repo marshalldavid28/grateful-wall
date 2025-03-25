@@ -11,6 +11,7 @@ import { TestimonialFormFooter } from './upload-modal/TestimonialFormFooter';
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isSubmitting?: boolean;
   onSubmit: (data: {
     name: string;
     text: string;
@@ -25,7 +26,8 @@ interface UploadModalProps {
 export const UploadModal: React.FC<UploadModalProps> = ({
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  isSubmitting = false
 }) => {
   const [step, setStep] = useState<'select' | 'form'>('select');
   const [testimonialType, setTestimonialType] = useState<TestimonialType | null>(null);
@@ -70,7 +72,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       type: testimonialType,
       headline: testimonialType === 'linkedin' ? headline : undefined
     });
-    resetForm();
   };
 
   const resetForm = () => {
@@ -86,8 +87,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleClose = () => {
-    resetForm();
-    onClose();
+    if (!isSubmitting) {
+      resetForm();
+      onClose();
+    }
   };
 
   const handleTypeSelect = (type: TestimonialType) => {
@@ -138,7 +141,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               />
             )}
 
-            <TestimonialFormFooter onCancel={handleClose} />
+            <TestimonialFormFooter 
+              onCancel={handleClose} 
+              isSubmitting={isSubmitting}
+            />
           </form>
         )}
       </DialogContent>

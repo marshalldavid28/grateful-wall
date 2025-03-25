@@ -12,6 +12,7 @@ const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   // Load testimonials on component mount
@@ -36,10 +37,12 @@ const Index = () => {
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    if (!isSubmitting) {
+      setIsModalOpen(false);
+    }
   };
 
-  const handleSubmitTestimonial = (data: {
+  const handleSubmitTestimonial = async (data: {
     name: string;
     text: string;
     company?: string;
@@ -49,33 +52,28 @@ const Index = () => {
     headline?: string;
   }) => {
     try {
+      setIsSubmitting(true);
+      
       // Handle different testimonial types
-      const testimonialData: Partial<Testimonial> = {
+      const testimonialData: Partial<Testimonial> & { image?: File } = {
         name: data.name,
         type: data.type,
+        image: data.image,
       };
 
       if (data.type === 'written') {
         testimonialData.text = data.text;
         testimonialData.company = data.company;
         testimonialData.role = data.role;
-        // Use the image as avatar for written testimonials
-        if (data.image) {
-          testimonialData.avatarUrl = URL.createObjectURL(data.image);
-        }
       } else if (data.type === 'linkedin') {
         // For LinkedIn testimonials, we use text for the headline content
         testimonialData.text = data.headline || 'LinkedIn Testimonial';
         testimonialData.headline = data.headline;
-        // Use the image as LinkedIn screenshot for linkedin testimonials
-        if (data.image) {
-          testimonialData.imageUrl = URL.createObjectURL(data.image);
-        }
       }
 
       // Add the new testimonial, passing the current list to ensure we're not losing any
-      const newTestimonial = addTestimonial(
-        testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'>, 
+      const newTestimonial = await addTestimonial(
+        testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }, 
         userTestimonials
       );
 
@@ -93,6 +91,8 @@ const Index = () => {
         description: "There was a problem saving your testimonial. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -147,6 +147,7 @@ const Index = () => {
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
         onSubmit={handleSubmitTestimonial}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
