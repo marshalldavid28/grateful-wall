@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { getTestimonials, Testimonial, deleteTestimonial } from '@/utils/testimonials';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -99,15 +99,23 @@ const Admin = () => {
       console.log('Delete initiated for testimonial ID:', id);
       setDeleteLoading(id);
       
+      // Log the testimonial that's being deleted for debugging
+      const testimonialToDelete = userTestimonials.find(t => t.id === id);
+      console.log('Attempting to delete testimonial:', testimonialToDelete);
+      
       // Delete from Supabase
-      await deleteTestimonial(id);
+      const wasDeleted = await deleteTestimonial(id);
       
-      // Update local state immediately for better UX
-      setUserTestimonials(prevTestimonials => 
-        prevTestimonials.filter(testimonial => testimonial.id !== id)
-      );
-      
-      toast.success("Testimonial deleted successfully");
+      if (wasDeleted) {
+        // Update local state immediately for better UX
+        setUserTestimonials(prevTestimonials => 
+          prevTestimonials.filter(testimonial => testimonial.id !== id)
+        );
+        
+        toast.success("Testimonial deleted successfully");
+      } else {
+        toast.error("No testimonial was deleted. It may have already been removed.");
+      }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
       toast.error("Failed to delete testimonial. Please try again.");
