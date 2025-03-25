@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -147,25 +148,24 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
     console.log('Starting deletion process for testimonial with ID:', id);
     
     if (!id) {
+      console.error('Invalid testimonial ID provided for deletion');
       throw new Error('Invalid testimonial ID provided for deletion');
     }
-    
-    // Log the exact query we're about to execute
-    console.log(`Executing DELETE FROM testimonials WHERE id = '${id}'`);
     
     // First, check if the testimonial exists
     console.log(`Checking if testimonial with ID ${id} exists...`);
     const { data: existingData, error: checkError } = await supabase
       .from('testimonials')
       .select('id')
-      .eq('id', id);
+      .eq('id', id)
+      .maybeSingle();
     
     if (checkError) {
       console.error('Error checking if testimonial exists:', checkError);
-      return false;
+      throw checkError;
     }
     
-    if (!existingData || existingData.length === 0) {
+    if (!existingData) {
       console.log(`No testimonial found with ID: ${id}`);
       return false;
     }
@@ -173,7 +173,7 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
     console.log(`Testimonial found, proceeding with deletion. Data:`, existingData);
     
     // Execute the delete operation
-    const { error, count } = await supabase
+    const { error } = await supabase
       .from('testimonials')
       .delete()
       .eq('id', id);
@@ -183,11 +183,8 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
       throw error;
     }
     
-    // Check if any rows were affected
-    const wasDeleted = count !== null && count > 0;
-    console.log(`Deletion result for ID ${id}: Deleted=${wasDeleted}, Count=${count}`);
-    
-    return wasDeleted;
+    console.log(`Successfully deleted testimonial with ID: ${id}`);
+    return true;
   } catch (error) {
     console.error('Error in deleteTestimonial:', error);
     throw error;

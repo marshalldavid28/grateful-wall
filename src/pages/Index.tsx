@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
-import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, addTestimonial, deleteTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const { toast: shadcnToast } = useToast();
 
   useEffect(() => {
@@ -63,6 +65,52 @@ const Index = () => {
   const handleCloseModal = () => {
     if (!isSubmitting) {
       setIsModalOpen(false);
+    }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    try {
+      console.log('Delete initiated for testimonial ID:', id);
+      setDeleteLoading(id);
+      
+      // Find the testimonial in our local state
+      const testimonialToDelete = userTestimonials.find(t => t.id === id);
+      console.log('Attempting to delete testimonial:', testimonialToDelete);
+      
+      if (!testimonialToDelete) {
+        console.error(`Testimonial with ID ${id} not found in local state`);
+        toast.error("Could not find testimonial to delete");
+        setDeleteLoading(null);
+        return;
+      }
+      
+      console.log(`Found testimonial in local state, proceeding with deletion: ${testimonialToDelete.name}`);
+      
+      try {
+        // Attempt to delete from Supabase
+        const wasDeleted = await deleteTestimonial(id);
+        console.log(`Deletion API result for ${id}: ${wasDeleted}`);
+        
+        if (wasDeleted) {
+          // Update local state immediately for better UX
+          setUserTestimonials(prevTestimonials => 
+            prevTestimonials.filter(testimonial => testimonial.id !== id)
+          );
+          
+          toast.success("Testimonial deleted successfully");
+        } else {
+          console.error(`Failed to delete testimonial with ID ${id}`);
+          toast.error("No testimonial was deleted. It may have already been removed.");
+        }
+      } catch (deleteError) {
+        console.error('Error from deletion API:', deleteError);
+        toast.error("Failed to delete testimonial. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error in handleDeleteTestimonial:', error);
+      toast.error("Failed to process delete request. Please try again.");
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -141,7 +189,12 @@ const Index = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : userTestimonials.length > 0 ? (
-            <TestimonialWall testimonials={userTestimonials} />
+            <TestimonialWall 
+              testimonials={userTestimonials} 
+              onDelete={handleDeleteTestimonial}
+              isAdmin={true}
+              deletingId={deleteLoading}
+            />
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No testimonials yet. Be the first to share your experience!</p>

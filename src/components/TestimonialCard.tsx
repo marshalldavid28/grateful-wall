@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     if (confirmDelete) {
       console.log('Confirmed delete for testimonial ID:', id);
       if (onDelete) {
+        console.log('Calling onDelete with ID:', id);
         onDelete(id);
       }
       setConfirmDelete(false);
