@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -51,7 +52,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
 
   return (
     <div className={cn(
-      "testimonial-card h-full",
+      "testimonial-card",
       className
     )}>
       <div className="flex flex-col h-full">
@@ -103,7 +104,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
               <Quote size={24} />
             </div>
             
-            <p className="text-foreground/80 mb-6 flex-grow">{text}</p>
+            <p className="text-foreground/80 mb-6">{text}</p>
           </>
         )}
       </div>

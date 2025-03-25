@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { TestimonialCard } from './TestimonialCard';
 import { Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -32,9 +32,16 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
         if (!a.imageUrl && b.imageUrl) return 1;
       }
       
-      // For written testimonials, sort by text length to balance visual layout
+      // For written testimonials, alternate short and long content for better layout
       if (a.type === 'written' && b.type === 'written') {
-        return (b.text?.length || 0) - (a.text?.length || 0);
+        const aLength = a.text?.length || 0;
+        const bLength = b.text?.length || 0;
+        
+        // Distribute testimonials by size for better visual balance
+        if (aLength > 200 && bLength < 100) return -1; 
+        if (aLength < 100 && bLength > 200) return 1;
+        
+        return bLength - aLength;
       }
       
       return 0;
