@@ -8,6 +8,7 @@ import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonia
 import { useToast } from '@/components/ui/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
@@ -32,6 +33,32 @@ const Index = () => {
     };
 
     fetchTestimonials();
+
+    // Subscribe to changes in the testimonials table
+    const testimonialsChannel = supabase
+      .channel('testimonials-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'testimonials' 
+        }, 
+        async () => {
+          // Refresh testimonials when changes are detected
+          try {
+            const refreshedTestimonials = await getTestimonials();
+            setUserTestimonials(refreshedTestimonials);
+          } catch (error) {
+            console.error('Error refreshing testimonials:', error);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      // Unsubscribe from the channel when the component unmounts
+      supabase.removeChannel(testimonialsChannel);
+    };
   }, []);
 
   const handleOpenModal = () => {

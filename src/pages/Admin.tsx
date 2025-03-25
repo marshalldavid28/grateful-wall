@@ -30,6 +30,32 @@ const Admin = () => {
     };
 
     fetchTestimonials();
+
+    // Subscribe to changes in the testimonials table
+    const testimonialsChannel = supabase
+      .channel('admin-testimonials-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'testimonials' 
+        }, 
+        async () => {
+          // Refresh testimonials when changes are detected
+          try {
+            const refreshedTestimonials = await getTestimonials();
+            setUserTestimonials(refreshedTestimonials);
+          } catch (error) {
+            console.error('Error refreshing testimonials:', error);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      // Unsubscribe from the channel when the component unmounts
+      supabase.removeChannel(testimonialsChannel);
+    };
   }, []);
 
   useEffect(() => {
