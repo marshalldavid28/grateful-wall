@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <img 
               src="/lovable-uploads/6e069cee-3f89-4e4f-8aeb-55b02249311c.png" 
               alt="Adtechademy Logo" 
-              className="h-10 md:h-12"
+              className="h-8 md:h-10"
             />
           </a>
         </div>

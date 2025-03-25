@@ -7,21 +7,29 @@ import { cn } from '@/lib/utils';
 interface TestimonialWallProps {
   testimonials: Testimonial[];
   className?: string;
+  onDelete?: (id: string) => void;
+  isAdmin?: boolean;
 }
 
 export const TestimonialWall: React.FC<TestimonialWallProps> = ({ 
   testimonials,
-  className 
+  className,
+  onDelete,
+  isAdmin = false
 }) => {
   return (
     <div className={cn("testimonial-grid", className)}>
       {testimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className={cn("stagger-item", testimonial.featured ? "md:col-span-2 lg:col-span-1" : "")}
+          className="stagger-item"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
-          <TestimonialCard testimonial={testimonial} />
+          <TestimonialCard 
+            testimonial={testimonial} 
+            onDelete={onDelete}
+            isAdmin={isAdmin}
+          />
         </div>
       ))}
     </div>

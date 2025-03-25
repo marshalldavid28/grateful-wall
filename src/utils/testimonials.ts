@@ -13,7 +13,6 @@ export interface Testimonial {
   verified: boolean;
   source?: 'linkedin' | 'website' | 'email' | 'other';
   imageUrl?: string;
-  featured?: boolean;
   tags?: string[];
 }
 
@@ -30,7 +29,6 @@ export const testimonials: Testimonial[] = [
     date: new Date("2023-06-15"),
     verified: true,
     source: "linkedin",
-    featured: true,
     tags: ["data science", "beginner friendly"]
   },
   {
@@ -57,7 +55,6 @@ export const testimonials: Testimonial[] = [
     date: new Date("2023-07-03"),
     verified: true,
     source: "email",
-    featured: true,
     tags: ["design", "intermediate"]
   }
 ];
@@ -82,7 +79,7 @@ export const getTestimonials = (): Testimonial[] => {
   return testimonials;
 };
 
-// Function to get featured testimonials
-export const getFeaturedTestimonials = (): Testimonial[] => {
-  return testimonials.filter(testimonial => testimonial.featured);
+// Function to delete a testimonial
+export const deleteTestimonial = (id: string, testimonials: Testimonial[]): Testimonial[] => {
+  return testimonials.filter(testimonial => testimonial.id !== id);
 };

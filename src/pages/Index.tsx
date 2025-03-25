@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
@@ -39,7 +40,6 @@ const Index = () => {
       avatarUrl: data.image 
         ? URL.createObjectURL(data.image) 
         : undefined,
-      featured: false
     });
 
     setUserTestimonials([newTestimonial, ...userTestimonials]);
@@ -68,10 +68,18 @@ const Index = () => {
               Discover how Adtechademy has transformed careers and opened new opportunities
               for our graduates in the ad tech industry.
             </p>
-            <AddTestimonialButton 
-              onClick={handleOpenModal} 
-              className="mx-auto"
-            />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <AddTestimonialButton 
+                onClick={handleOpenModal} 
+                className="mx-auto"
+              />
+              <Link 
+                to="/login" 
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Admin Login
+              </Link>
+            </div>
           </div>
         </section>
 
