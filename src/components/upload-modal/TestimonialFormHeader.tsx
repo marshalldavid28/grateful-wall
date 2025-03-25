@@ -28,14 +28,14 @@ export const TestimonialFormHeader: React.FC<TestimonialFormHeaderProps> = ({
         </Button>
         <DialogTitle className="text-2xl font-display">
           {testimonialType === 'written' 
-            ? 'Write Your Testimonial' 
-            : 'Upload LinkedIn Screenshot'}
+            ? 'Written Testimonial' 
+            : 'LinkedIn Screenshot'}
         </DialogTitle>
       </div>
       <DialogDescription>
         {testimonialType === 'written'
-          ? "We'd love to hear about your journey with Adtechademy!"
-          : "Share a screenshot of your LinkedIn recommendation for Adtechademy"}
+          ? "Share your story" 
+          : "Upload a screenshot of your recommendation"}
       </DialogDescription>
     </DialogHeader>
   );

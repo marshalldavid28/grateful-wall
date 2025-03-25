@@ -11,9 +11,9 @@ export const TestimonialSelectionStep: React.FC<TestimonialSelectionStepProps> =
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-2xl font-display">Share Your Experience</DialogTitle>
+        <DialogTitle className="text-2xl font-display">Testimonial</DialogTitle>
         <DialogDescription>
-          Choose how you'd like to share your experience with Adtechademy
+          Choose how you want to share your story
         </DialogDescription>
       </DialogHeader>
 
