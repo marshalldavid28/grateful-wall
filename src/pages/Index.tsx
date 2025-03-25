@@ -1,16 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
-import { testimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 
 const Index = () => {
-  const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>(testimonials);
+  const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
+
+  // Load testimonials on component mount
+  useEffect(() => {
+    const loadedTestimonials = getTestimonials();
+    setUserTestimonials(loadedTestimonials);
+  }, []);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -27,10 +33,7 @@ const Index = () => {
     role?: string;
     image?: File;
   }) => {
-    // In a real app, we would upload the image to a server
-    // and get back a URL. For now, we'll just use a placeholder URL
-    // if there's an image, or null if there isn't.
-    
+    // Add the new testimonial, passing the current list to ensure we're not losing any
     const newTestimonial = addTestimonial({
       name: data.name,
       text: data.text,
@@ -39,7 +42,7 @@ const Index = () => {
       avatarUrl: data.image 
         ? URL.createObjectURL(data.image) 
         : undefined,
-    });
+    }, userTestimonials);
 
     setUserTestimonials([newTestimonial, ...userTestimonials]);
     handleCloseModal();

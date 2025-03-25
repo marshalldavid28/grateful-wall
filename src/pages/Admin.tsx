@@ -3,15 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
-import { testimonials, Testimonial, deleteTestimonial } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, deleteTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const Admin = () => {
-  const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>(testimonials);
+  const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Load testimonials on component mount
+  useEffect(() => {
+    const loadedTestimonials = getTestimonials();
+    setUserTestimonials(loadedTestimonials);
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -49,6 +55,7 @@ const Admin = () => {
   }, [navigate]);
 
   const handleDeleteTestimonial = (id: string) => {
+    // Delete from current state and localStorage
     const updatedTestimonials = deleteTestimonial(id, userTestimonials);
     setUserTestimonials(updatedTestimonials);
     

@@ -16,8 +16,8 @@ export interface Testimonial {
   tags?: string[];
 }
 
-// Mock testimonials data for initial display
-export const testimonials: Testimonial[] = [
+// Default testimonials data for initial display if no stored testimonials exist
+const defaultTestimonials: Testimonial[] = [
   {
     id: uuidv4(),
     name: "Alex Johnson",
@@ -59,8 +59,51 @@ export const testimonials: Testimonial[] = [
   }
 ];
 
+// Helper function to serialize/deserialize Date objects for localStorage
+const serializeTestimonial = (testimonial: Testimonial): any => ({
+  ...testimonial,
+  date: testimonial.date.toISOString()
+});
+
+const deserializeTestimonial = (testimonial: any): Testimonial => ({
+  ...testimonial,
+  date: new Date(testimonial.date)
+});
+
+// Load testimonials from localStorage or use default ones
+export const getTestimonials = (): Testimonial[] => {
+  try {
+    const storedTestimonials = localStorage.getItem('testimonials');
+    
+    if (storedTestimonials) {
+      // Parse stored testimonials and deserialize the date
+      const parsed = JSON.parse(storedTestimonials);
+      return parsed.map(deserializeTestimonial);
+    } else {
+      // If no stored testimonials, save the default ones and return them
+      localStorage.setItem('testimonials', JSON.stringify(defaultTestimonials.map(serializeTestimonial)));
+      return defaultTestimonials;
+    }
+  } catch (error) {
+    console.error('Error loading testimonials from localStorage:', error);
+    return defaultTestimonials;
+  }
+};
+
+// Save testimonials to localStorage
+const saveTestimonials = (testimonials: Testimonial[]): void => {
+  try {
+    localStorage.setItem('testimonials', JSON.stringify(testimonials.map(serializeTestimonial)));
+  } catch (error) {
+    console.error('Error saving testimonials to localStorage:', error);
+  }
+};
+
 // Function to add a new testimonial
-export const addTestimonial = (testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'>): Testimonial => {
+export const addTestimonial = (testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'>, currentTestimonials: Testimonial[] = []): Testimonial => {
+  // Get existing testimonials first
+  const testimonials = currentTestimonials.length ? currentTestimonials : getTestimonials();
+  
   const newTestimonial: Testimonial = {
     id: uuidv4(),
     ...testimonial,
@@ -68,18 +111,23 @@ export const addTestimonial = (testimonial: Omit<Testimonial, 'id' | 'date' | 'v
     verified: false,
   };
   
-  // In a real application, you would persist this to a database
-  // For now, we'll just return the new testimonial
+  // Add new testimonial and save to localStorage
+  const updatedTestimonials = [newTestimonial, ...testimonials];
+  saveTestimonials(updatedTestimonials);
+  
   return newTestimonial;
 };
 
-// Function to get all testimonials
-export const getTestimonials = (): Testimonial[] => {
-  // In a real application, you would fetch this from an API or database
-  return testimonials;
+// Function to delete a testimonial
+export const deleteTestimonial = (id: string, currentTestimonials: Testimonial[] = []): Testimonial[] => {
+  // Get existing testimonials first if not provided
+  const testimonials = currentTestimonials.length ? currentTestimonials : getTestimonials();
+  
+  const updatedTestimonials = testimonials.filter(testimonial => testimonial.id !== id);
+  saveTestimonials(updatedTestimonials);
+  
+  return updatedTestimonials;
 };
 
-// Function to delete a testimonial
-export const deleteTestimonial = (id: string, testimonials: Testimonial[]): Testimonial[] => {
-  return testimonials.filter(testimonial => testimonial.id !== id);
-};
+// Legacy export for backward compatibility
+export const testimonials = getTestimonials();
