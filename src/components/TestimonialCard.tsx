@@ -18,6 +18,26 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   isAdmin = false
 }) => {
   const { id, name, avatarUrl, text, company, role, tags } = testimonial;
+  
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  
+  const handleDeleteClick = () => {
+    if (confirmDelete) {
+      onDelete?.(id);
+      setConfirmDelete(false);
+    } else {
+      setConfirmDelete(true);
+    }
+  };
+  
+  // Reset confirm state when clicking outside
+  React.useEffect(() => {
+    const resetConfirm = () => setConfirmDelete(false);
+    if (confirmDelete) {
+      document.addEventListener('click', resetConfirm, { once: true });
+      return () => document.removeEventListener('click', resetConfirm);
+    }
+  }, [confirmDelete]);
 
   return (
     <div className={cn("testimonial-card flex flex-col h-full", className)}>      
@@ -25,35 +45,35 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
         <Quote size={24} />
       </div>
       
-      <p className="text-foreground/80 mb-6 flex-grow">{text}</p>
+      <p className="text-foreground/80 mb-6 flex-grow line-clamp-6 sm:line-clamp-none">{text}</p>
       
-      <div className="flex items-center justify-between mt-auto">
+      <div className="flex flex-wrap items-center justify-between mt-auto">
         <div className="flex items-center">
           {avatarUrl ? (
-            <div className="flex-shrink-0 mr-4">
+            <div className="flex-shrink-0 mr-3">
               <img 
                 src={avatarUrl} 
                 alt={name} 
-                className="h-12 w-12 rounded-full object-cover border border-muted"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover border border-muted"
               />
             </div>
           ) : (
-            <div className="flex-shrink-0 mr-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="flex-shrink-0 mr-3 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary font-medium">
                 {name.split(' ').map(n => n[0]).join('')}
               </span>
             </div>
           )}
           
-          <div>
-            <h4 className="font-medium text-foreground">{name}</h4>
+          <div className="min-w-0 max-w-[70%]">
+            <h4 className="font-medium text-foreground truncate">{name}</h4>
             {(role || company) && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground truncate">
                 {role}{role && company && ' at '}{company}
               </p>
             )}
             {tags && tags.length > 0 && (
-              <p className="text-xs text-primary mt-1">
+              <p className="text-xs text-primary mt-1 truncate">
                 {tags.join(', ')}
               </p>
             )}
@@ -62,9 +82,17 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
 
         {isAdmin && onDelete && (
           <button 
-            onClick={() => onDelete(id)}
-            className="text-red-500 hover:text-red-700 transition-colors p-2"
-            aria-label="Delete testimonial"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteClick();
+            }}
+            className={cn(
+              "flex-shrink-0 transition-colors p-2 rounded-full",
+              confirmDelete 
+                ? "bg-red-100 text-red-600 hover:bg-red-200" 
+                : "text-red-500 hover:text-red-700"
+            )}
+            aria-label={confirmDelete ? "Confirm delete" : "Delete testimonial"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18"></path>
