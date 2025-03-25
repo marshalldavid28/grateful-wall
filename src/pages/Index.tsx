@@ -75,7 +75,6 @@ const Index = () => {
     role?: string;
     image?: File;
     type: TestimonialType;
-    headline?: string;
     linkedinUrl?: string;
   }) => {
     try {
@@ -92,8 +91,7 @@ const Index = () => {
         testimonialData.company = data.company;
         testimonialData.role = data.role;
       } else if (data.type === 'linkedin') {
-        testimonialData.text = data.headline || 'LinkedIn Testimonial';
-        testimonialData.headline = data.headline;
+        testimonialData.text = 'LinkedIn Testimonial';
         testimonialData.linkedinUrl = data.linkedinUrl;
       }
 

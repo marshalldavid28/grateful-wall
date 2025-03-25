@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -29,7 +30,6 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     role, 
     tags, 
     type, 
-    headline, 
     imageUrl, 
     linkedinUrl 
   } = testimonial;
@@ -83,10 +83,6 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
           </>
         )}
       </div>
-      
-      {headline && (
-        <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
-      )}
       
       {imageUrl && (
         <div className="mb-4 rounded-md overflow-hidden border border-border relative group">

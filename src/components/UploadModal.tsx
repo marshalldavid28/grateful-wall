@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TestimonialType } from './TestimonialTypeSelector';
@@ -18,7 +19,6 @@ interface UploadModalProps {
     role?: string;
     image?: File;
     type: TestimonialType;
-    headline?: string;
     linkedinUrl?: string;
   }) => void;
 }
@@ -36,7 +36,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const [text, setText] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
-  const [headline, setHeadline] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -82,7 +81,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     setText('');
     setCompany('');
     setRole('');
-    setHeadline('');
     setLinkedinUrl('');
     setImage(null);
     setPreview(null);
@@ -135,8 +133,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               <LinkedinTestimonialForm
                 name={name}
                 setName={setName}
-                headline={headline}
-                setHeadline={setHeadline}
                 linkedinUrl={linkedinUrl}
                 setLinkedinUrl={setLinkedinUrl}
                 preview={preview}
