@@ -1,0 +1,30 @@
+
+@layer components {
+  /* Button Components */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground rounded-full px-6 py-3 
+           transition-all duration-300 shadow-sm
+           hover:shadow-md hover:bg-primary/90 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground rounded-full px-6 py-3 
+           transition-all duration-300
+           hover:bg-secondary/70 active:scale-95;
+  }
+
+  /* Chip Component */
+  .chip {
+    @apply inline-flex items-center px-3 py-1 text-xs font-medium
+           rounded-full bg-accent text-accent-foreground;
+  }
+
+  /* Section Components */
+  .section-title {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-xl text-muted-foreground max-w-2xl;
+  }
+}
