@@ -99,23 +99,10 @@ const Admin = () => {
       console.log('Delete initiated for testimonial ID:', id);
       setDeleteLoading(id);
       
-      // Find the testimonial in our local state
-      const testimonialToDelete = userTestimonials.find(t => t.id === id);
-      console.log('Attempting to delete testimonial:', testimonialToDelete);
-      
-      if (!testimonialToDelete) {
-        console.error(`Testimonial with ID ${id} not found in local state`);
-        toast.error("Could not find testimonial to delete");
-        setDeleteLoading(null);
-        return;
-      }
-      
-      console.log(`Found testimonial in local state, proceeding with deletion: ${testimonialToDelete.name}`);
-      
       try {
         // Attempt to delete from Supabase
         const wasDeleted = await deleteTestimonial(id);
-        console.log(`Deletion API result for ${id}: ${wasDeleted}`);
+        console.log(`Deletion result for ${id}: ${wasDeleted}`);
         
         if (wasDeleted) {
           // Update local state immediately for better UX
@@ -126,11 +113,11 @@ const Admin = () => {
           toast.success("Testimonial deleted successfully");
         } else {
           console.error(`Failed to delete testimonial with ID ${id}`);
-          toast.error("No testimonial was deleted. It may have already been removed.");
+          toast.error("Failed to delete testimonial. Please try again.");
         }
       } catch (deleteError) {
         console.error('Error from deletion API:', deleteError);
-        toast.error("Error during deletion. Please check console for details.");
+        toast.error("Error during deletion. Please try again.");
       }
     } catch (error) {
       console.error('Error in handleDeleteTestimonial:', error);
