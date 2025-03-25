@@ -4,12 +4,11 @@ import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
-import { mockTestimonials, Testimonial } from '@/utils/testimonials';
+import { testimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
-import { v4 as uuidv4 } from 'uuid';
 
 const Index = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(mockTestimonials);
+  const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>(testimonials);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 
@@ -26,28 +25,24 @@ const Index = () => {
     text: string;
     company?: string;
     role?: string;
-    course?: string;
     image?: File;
   }) => {
     // In a real app, we would upload the image to a server
     // and get back a URL. For now, we'll just use a placeholder URL
     // if there's an image, or null if there isn't.
     
-    const newTestimonial: Testimonial = {
-      id: uuidv4(),
-      studentName: data.name,
+    const newTestimonial = addTestimonial({
+      name: data.name,
       text: data.text,
       company: data.company,
       role: data.role,
-      course: data.course,
-      imageUrl: data.image 
+      avatarUrl: data.image 
         ? URL.createObjectURL(data.image) 
         : undefined,
-      date: new Date().toISOString().split('T')[0],
       featured: false
-    };
+    });
 
-    setTestimonials([newTestimonial, ...testimonials]);
+    setUserTestimonials([newTestimonial, ...userTestimonials]);
     handleCloseModal();
     
     toast({
@@ -81,7 +76,7 @@ const Index = () => {
         </section>
 
         <section className="animate-fade-in">
-          <TestimonialWall testimonials={testimonials} />
+          <TestimonialWall testimonials={userTestimonials} />
         </section>
       </main>
 

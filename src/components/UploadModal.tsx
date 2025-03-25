@@ -22,7 +22,6 @@ interface UploadModalProps {
     text: string;
     company?: string;
     role?: string;
-    course?: string;
     image?: File;
   }) => void;
 }
@@ -36,7 +35,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const [text, setText] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
-  const [course, setCourse] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -61,7 +59,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       text,
       company,
       role,
-      course,
       image: image || undefined
     });
     resetForm();
@@ -72,7 +69,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     setText('');
     setCompany('');
     setRole('');
-    setCourse('');
     setImage(null);
     setPreview(null);
   };
@@ -140,17 +136,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                   className="mt-1"
                 />
               </div>
-            </div>
-
-            <div>
-              <Label htmlFor="course">Course Taken</Label>
-              <Input
-                id="course"
-                value={course}
-                onChange={(e) => setCourse(e.target.value)}
-                placeholder="Which Adtechademy course did you take?"
-                className="mt-1"
-              />
             </div>
 
             <div>
