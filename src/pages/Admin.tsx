@@ -6,30 +6,31 @@ import { TestimonialWall } from '@/components/TestimonialWall';
 import { getTestimonials, Testimonial, deleteTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Admin = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const { toast } = useToast();
+  const { toast: shadcnToast } = useToast();
   const navigate = useNavigate();
 
   // Load testimonials on component mount
   useEffect(() => {
-    try {
-      const loadedTestimonials = getTestimonials();
-      setUserTestimonials(loadedTestimonials);
-    } catch (error) {
-      console.error('Error loading testimonials:', error);
-      toast({
-        title: "Error Loading Testimonials",
-        description: "There was a problem loading the testimonials data.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    const fetchTestimonials = async () => {
+      try {
+        const loadedTestimonials = await getTestimonials();
+        setUserTestimonials(loadedTestimonials);
+      } catch (error) {
+        console.error('Error loading testimonials:', error);
+        toast.error("Error loading testimonials. Please refresh the page.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -67,24 +68,22 @@ const Admin = () => {
     checkSession();
   }, [navigate]);
 
-  const handleDeleteTestimonial = (id: string) => {
+  const handleDeleteTestimonial = async (id: string) => {
     try {
       setDeleteLoading(true);
-      // Delete from current state and localStorage
-      const updatedTestimonials = deleteTestimonial(id, userTestimonials);
-      setUserTestimonials(updatedTestimonials);
       
-      toast({
-        title: "Testimonial Deleted",
-        description: "The testimonial has been removed successfully.",
-      });
+      // Delete from Supabase
+      await deleteTestimonial(id);
+      
+      // Update local state
+      setUserTestimonials(prevTestimonials => 
+        prevTestimonials.filter(testimonial => testimonial.id !== id)
+      );
+      
+      toast.success("Testimonial deleted successfully");
     } catch (error) {
       console.error('Error deleting testimonial:', error);
-      toast({
-        title: "Deletion Failed",
-        description: "There was a problem removing the testimonial.",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete testimonial. Please try again.");
     } finally {
       setDeleteLoading(false);
     }
@@ -100,11 +99,7 @@ const Admin = () => {
       navigate('/login');
     } catch (error) {
       console.error('Sign out error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to sign out. Please try again.");
     }
   };
 

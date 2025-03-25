@@ -7,30 +7,32 @@ import { UploadModal } from '@/components/UploadModal';
 import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { toast: shadcnToast } = useToast();
 
   // Load testimonials on component mount
   useEffect(() => {
-    try {
-      const loadedTestimonials = getTestimonials();
-      setUserTestimonials(loadedTestimonials);
-    } catch (error) {
-      console.error('Error loading testimonials:', error);
-      toast({
-        title: "Error Loading Testimonials",
-        description: "There was a problem loading the testimonials. Please refresh the page.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+    const fetchTestimonials = async () => {
+      try {
+        setIsLoading(true);
+        const loadedTestimonials = await getTestimonials();
+        setUserTestimonials(loadedTestimonials);
+      } catch (error) {
+        console.error('Error loading testimonials:', error);
+        toast.error("Error loading testimonials. Please refresh the page.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -71,26 +73,19 @@ const Index = () => {
         testimonialData.headline = data.headline;
       }
 
-      // Add the new testimonial, passing the current list to ensure we're not losing any
+      // Add the new testimonial to Supabase
       const newTestimonial = await addTestimonial(
-        testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }, 
-        userTestimonials
+        testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }
       );
 
+      // Update the local state with the new testimonial
       setUserTestimonials([newTestimonial, ...userTestimonials]);
       handleCloseModal();
       
-      toast({
-        title: "Testimonial Submitted!",
-        description: "Thank you for sharing your experience with Adtechademy!",
-      });
+      toast.success("Testimonial submitted successfully!");
     } catch (error) {
       console.error('Error submitting testimonial:', error);
-      toast({
-        title: "Submission Failed",
-        description: "There was a problem saving your testimonial. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to submit testimonial. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

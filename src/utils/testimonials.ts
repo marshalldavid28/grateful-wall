@@ -1,5 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Testimonial {
   id: string;
@@ -74,96 +75,163 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-// Helper function to serialize/deserialize Date objects for localStorage
-const serializeTestimonial = (testimonial: Testimonial): any => ({
-  ...testimonial,
-  date: testimonial.date.toISOString()
-});
-
-const deserializeTestimonial = (testimonial: any): Testimonial => ({
-  ...testimonial,
-  date: new Date(testimonial.date)
-});
-
-// Load testimonials from localStorage or use default ones
-export const getTestimonials = (): Testimonial[] => {
-  try {
-    const storedTestimonials = localStorage.getItem('testimonials');
-    
-    if (storedTestimonials) {
-      // Parse stored testimonials and deserialize the date
-      const parsed = JSON.parse(storedTestimonials);
-      return parsed.map(deserializeTestimonial);
-    } else {
-      // If no stored testimonials, save the default ones and return them
-      localStorage.setItem('testimonials', JSON.stringify(defaultTestimonials.map(serializeTestimonial)));
-      return defaultTestimonials;
-    }
-  } catch (error) {
-    console.error('Error loading testimonials from localStorage:', error);
-    return defaultTestimonials;
-  }
+// Convert Supabase record to Testimonial object
+const mapSupabaseRecordToTestimonial = (record: any): Testimonial => {
+  return {
+    id: record.id,
+    name: record.name,
+    role: record.role || undefined,
+    company: record.company || undefined,
+    text: record.text,
+    avatarUrl: record.avatar_url || undefined,
+    rating: record.rating || undefined,
+    date: new Date(record.date),
+    verified: record.verified,
+    source: record.source as any || undefined,
+    imageUrl: record.image_url || undefined,
+    tags: record.tags || undefined,
+    type: record.type as 'written' | 'linkedin',
+    headline: record.headline || undefined
+  };
 };
 
-// Save testimonials to localStorage
-const saveTestimonials = (testimonials: Testimonial[]): void => {
+// Convert Testimonial object to Supabase record
+const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
+  return {
+    name: testimonial.name,
+    role: testimonial.role,
+    company: testimonial.company,
+    text: testimonial.text,
+    avatar_url: testimonial.avatarUrl,
+    rating: testimonial.rating,
+    verified: testimonial.verified || false,
+    source: testimonial.source,
+    image_url: testimonial.imageUrl,
+    tags: testimonial.tags,
+    type: testimonial.type,
+    headline: testimonial.headline
+  };
+};
+
+// Load testimonials from Supabase
+export const getTestimonials = async (): Promise<Testimonial[]> => {
   try {
-    localStorage.setItem('testimonials', JSON.stringify(testimonials.map(serializeTestimonial)));
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('date', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching testimonials from Supabase:', error);
+      // Fall back to default testimonials
+      return defaultTestimonials;
+    }
+    
+    // If we have data but it's empty and this is first time, seed with default testimonials
+    if (data && data.length === 0) {
+      // Check if we should seed the database
+      const shouldSeed = localStorage.getItem('testimonials_seeded') !== 'true';
+      
+      if (shouldSeed) {
+        // Seed the database with default testimonials
+        for (const testimonial of defaultTestimonials) {
+          await addTestimonial(testimonial);
+        }
+        localStorage.setItem('testimonials_seeded', 'true');
+        
+        // Fetch again after seeding
+        const { data: seededData, error: seededError } = await supabase
+          .from('testimonials')
+          .select('*')
+          .order('date', { ascending: false });
+          
+        if (seededError) {
+          console.error('Error fetching seeded testimonials:', seededError);
+          return defaultTestimonials;
+        }
+        
+        return (seededData || []).map(mapSupabaseRecordToTestimonial);
+      }
+      
+      return [];
+    }
+    
+    // Map data to Testimonial objects
+    return (data || []).map(mapSupabaseRecordToTestimonial);
   } catch (error) {
-    console.error('Error saving testimonials to localStorage:', error);
+    console.error('Error in getTestimonials:', error);
+    return defaultTestimonials;
   }
 };
 
 // Function to add a new testimonial
 export const addTestimonial = async (
   testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'> & { 
-    image?: File 
-  },
-  currentTestimonials: Testimonial[] = []
-): Promise<Testimonial> => {
-  // Get existing testimonials first
-  const testimonials = currentTestimonials.length ? currentTestimonials : getTestimonials();
-  
-  // Convert image to base64 if provided
-  let avatarUrl;
-  let imageUrl;
-  
-  if (testimonial.image) {
-    const base64Image = await fileToBase64(testimonial.image);
-    
-    if (testimonial.type === 'written') {
-      avatarUrl = base64Image;
-    } else if (testimonial.type === 'linkedin') {
-      imageUrl = base64Image;
-    }
+    image?: File,
+    id?: string,
+    date?: Date,
+    verified?: boolean
   }
-  
-  const newTestimonial: Testimonial = {
-    id: uuidv4(),
-    ...testimonial,
-    avatarUrl: avatarUrl || testimonial.avatarUrl,
-    imageUrl: imageUrl || testimonial.imageUrl,
-    date: new Date(),
-    verified: false,
-  };
-  
-  // Add new testimonial and save to localStorage
-  const updatedTestimonials = [newTestimonial, ...testimonials];
-  saveTestimonials(updatedTestimonials);
-  
-  return newTestimonial;
+): Promise<Testimonial> => {
+  try {
+    // Convert image to base64 if provided
+    let avatarUrl;
+    let imageUrl;
+    
+    if (testimonial.image) {
+      const base64Image = await fileToBase64(testimonial.image);
+      
+      if (testimonial.type === 'written') {
+        avatarUrl = base64Image;
+      } else if (testimonial.type === 'linkedin') {
+        imageUrl = base64Image;
+      }
+    }
+    
+    // Prepare the record for Supabase
+    const supabaseRecord = mapTestimonialToSupabaseRecord({
+      ...testimonial,
+      avatarUrl: avatarUrl || testimonial.avatarUrl,
+      imageUrl: imageUrl || testimonial.imageUrl
+    });
+    
+    // Insert the testimonial into Supabase
+    const { data, error } = await supabase
+      .from('testimonials')
+      .insert(supabaseRecord)
+      .select('*')
+      .single();
+    
+    if (error) {
+      console.error('Error adding testimonial to Supabase:', error);
+      throw error;
+    }
+    
+    // Return the newly created testimonial
+    return mapSupabaseRecordToTestimonial(data);
+  } catch (error) {
+    console.error('Error in addTestimonial:', error);
+    throw error;
+  }
 };
 
 // Function to delete a testimonial
-export const deleteTestimonial = (id: string, currentTestimonials: Testimonial[] = []): Testimonial[] => {
-  // Get existing testimonials first if not provided
-  const testimonials = currentTestimonials.length ? currentTestimonials : getTestimonials();
-  
-  const updatedTestimonials = testimonials.filter(testimonial => testimonial.id !== id);
-  saveTestimonials(updatedTestimonials);
-  
-  return updatedTestimonials;
+export const deleteTestimonial = async (id: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('testimonials')
+      .delete()
+      .eq('id', id);
+    
+    if (error) {
+      console.error('Error deleting testimonial from Supabase:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error in deleteTestimonial:', error);
+    throw error;
+  }
 };
 
 // Legacy export for backward compatibility
-export const testimonials = getTestimonials();
+export const testimonials = defaultTestimonials;
