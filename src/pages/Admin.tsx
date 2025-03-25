@@ -15,6 +15,15 @@ const Admin = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      // Check for demo admin login first
+      const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
+      
+      if (isDemoAdmin) {
+        setLoading(false);
+        return;
+      }
+      
+      // Check for regular Supabase session
       const { data } = await supabase.auth.getSession();
       
       if (!data.session) {
@@ -39,6 +48,10 @@ const Admin = () => {
   };
 
   const handleSignOut = async () => {
+    // Clear demo admin login if exists
+    localStorage.removeItem('demoAdminLoggedIn');
+    
+    // Sign out from Supabase auth
     await supabase.auth.signOut();
     navigate('/login');
   };

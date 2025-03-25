@@ -48,6 +48,24 @@ const Login = () => {
     
     setLoading(true);
     
+    // Special case for demo admin login
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      // For demo purposes, we're bypassing actual authentication
+      // In a real application, never do this - always authenticate properly
+      setLoading(false);
+      
+      toast({
+        title: "Demo Login Successful",
+        description: "Welcome to the admin panel!",
+      });
+      
+      // Set a session flag for demo admin in localStorage
+      localStorage.setItem('demoAdminLoggedIn', 'true');
+      navigate('/admin');
+      return;
+    }
+    
+    // Regular Supabase authentication for non-demo credentials
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
