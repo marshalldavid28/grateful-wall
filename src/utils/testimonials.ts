@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,52 +17,6 @@ export interface Testimonial {
   type: 'written' | 'linkedin';
   headline?: string;
 }
-
-// Default testimonials data for initial display if no stored testimonials exist
-const defaultTestimonials: Testimonial[] = [
-  {
-    id: uuidv4(),
-    name: "Alex Johnson",
-    role: "Data Science Student",
-    company: "TechU",
-    text: "The Adtechademy course completely transformed my understanding of digital marketing. The instructors were incredibly knowledgeable and supportive throughout the entire journey.",
-    avatarUrl: "https://i.pravatar.cc/150?img=1",
-    rating: 5,
-    date: new Date("2023-06-15"),
-    verified: true,
-    source: "linkedin",
-    tags: ["data science", "beginner friendly"],
-    type: "written"
-  },
-  {
-    id: uuidv4(),
-    name: "Sarah Miller",
-    role: "Marketing Manager",
-    company: "CreativeStudio",
-    text: "I've taken several online courses before, but Adtechademy stands out for its practical approach and real-world applications. The community support is fantastic too!",
-    avatarUrl: "https://i.pravatar.cc/150?img=2",
-    rating: 4,
-    date: new Date("2023-05-22"),
-    verified: true,
-    source: "website",
-    tags: ["marketing", "advanced"],
-    type: "written"
-  },
-  {
-    id: uuidv4(),
-    name: "Michael Chen",
-    role: "Product Designer",
-    company: "DesignHub",
-    text: "Adtechademy helped me bridge the gap between design and marketing. The instructors present complex concepts in an accessible way that's easy to understand and apply.",
-    avatarUrl: "https://i.pravatar.cc/150?img=3",
-    rating: 5,
-    date: new Date("2023-07-03"),
-    verified: true,
-    source: "email",
-    tags: ["design", "intermediate"],
-    type: "written"
-  }
-];
 
 // Helper function to convert File to base64 string
 const fileToBase64 = (file: File): Promise<string> => {
@@ -113,8 +66,7 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
   };
 };
 
-// Load testimonials from Supabase
-export const getTestimonials = async (): Promise<Testimonial[]> => {
+const getTestimonials = async (): Promise<Testimonial[]> => {
   try {
     const { data, error } = await supabase
       .from('testimonials')
@@ -131,7 +83,6 @@ export const getTestimonials = async (): Promise<Testimonial[]> => {
       return [];
     }
     
-    // Map data to Testimonial objects
     return (data || []).map(mapSupabaseRecordToTestimonial);
   } catch (error) {
     console.error('Error in getTestimonials:', error);
@@ -213,18 +164,4 @@ export const deleteTestimonial = async (id: string): Promise<void> => {
   }
 };
 
-// Add helper function to manually seed the database if needed (no auto-seeding)
-export const seedDefaultTestimonials = async (): Promise<void> => {
-  try {
-    for (const testimonial of defaultTestimonials) {
-      await addTestimonial(testimonial);
-    }
-    console.log('Default testimonials seeded successfully');
-  } catch (error) {
-    console.error('Error seeding default testimonials:', error);
-    throw error;
-  }
-};
-
-// Legacy export for backward compatibility
-export const testimonials = defaultTestimonials;
+export { getTestimonials, addTestimonial, deleteTestimonial };

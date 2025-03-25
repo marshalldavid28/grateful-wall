@@ -1,25 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
-import { getTestimonials, Testimonial, addTestimonial, seedDefaultTestimonials } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
   const { toast: shadcnToast } = useToast();
 
-  // Load testimonials on component mount
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
@@ -36,7 +32,6 @@ const Index = () => {
 
     fetchTestimonials();
 
-    // Subscribe to changes in the testimonials table
     const testimonialsChannel = supabase
       .channel('testimonials-changes')
       .on('postgres_changes', 
@@ -46,7 +41,6 @@ const Index = () => {
           table: 'testimonials' 
         }, 
         async () => {
-          // Refresh testimonials when changes are detected
           try {
             const refreshedTestimonials = await getTestimonials();
             setUserTestimonials(refreshedTestimonials);
@@ -58,7 +52,6 @@ const Index = () => {
       .subscribe();
 
     return () => {
-      // Unsubscribe from the channel when the component unmounts
       supabase.removeChannel(testimonialsChannel);
     };
   }, []);
@@ -70,29 +63,6 @@ const Index = () => {
   const handleCloseModal = () => {
     if (!isSubmitting) {
       setIsModalOpen(false);
-    }
-  };
-
-  const handleSeedTestimonials = async () => {
-    if (userTestimonials.length > 0) {
-      if (!window.confirm('There are already testimonials in the database. Are you sure you want to add example testimonials?')) {
-        return;
-      }
-    }
-    
-    try {
-      setIsSeeding(true);
-      await seedDefaultTestimonials();
-      toast.success("Example testimonials added successfully!");
-      
-      // Refresh the testimonials
-      const refreshedTestimonials = await getTestimonials();
-      setUserTestimonials(refreshedTestimonials);
-    } catch (error) {
-      console.error('Error seeding testimonials:', error);
-      toast.error("Failed to add example testimonials.");
-    } finally {
-      setIsSeeding(false);
     }
   };
 
@@ -108,7 +78,6 @@ const Index = () => {
     try {
       setIsSubmitting(true);
       
-      // Handle different testimonial types
       const testimonialData: Partial<Testimonial> & { image?: File } = {
         name: data.name,
         type: data.type,
@@ -120,17 +89,14 @@ const Index = () => {
         testimonialData.company = data.company;
         testimonialData.role = data.role;
       } else if (data.type === 'linkedin') {
-        // For LinkedIn testimonials, we use text for the headline content
         testimonialData.text = data.headline || 'LinkedIn Testimonial';
         testimonialData.headline = data.headline;
       }
 
-      // Add the new testimonial to Supabase
       const newTestimonial = await addTestimonial(
         testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }
       );
 
-      // Update the local state with the new testimonial
       setUserTestimonials([newTestimonial, ...userTestimonials]);
       handleCloseModal();
       
@@ -165,16 +131,6 @@ const Index = () => {
                 onClick={handleOpenModal} 
                 className="mx-auto"
               />
-              {userTestimonials.length === 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleSeedTestimonials}
-                  disabled={isSeeding}
-                  className="mx-auto"
-                >
-                  {isSeeding ? 'Adding examples...' : 'Add example testimonials'}
-                </Button>
-              )}
             </div>
           </div>
         </section>
