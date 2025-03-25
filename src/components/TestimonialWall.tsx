@@ -58,8 +58,12 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
       {arrangedTestimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className="testimonial-item stagger-item"
-          style={{ animationDelay: `${index * 0.1}s` }}
+          className="testimonial-item stagger-item animate-float"
+          style={{ 
+            animationDelay: `${index * 0.1}s`,
+            // Add a different float animation delay for each card to create a wave effect
+            animationDelay: `${1 + (index % 5) * 0.2}s`
+          }}
         >
           <TestimonialCard 
             testimonial={testimonial} 
