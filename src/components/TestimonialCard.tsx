@@ -50,9 +50,12 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     }
   }, [confirmDelete]);
 
+  const isLinkedInWithImage = type === 'linkedin' && imageUrl;
+
   return (
     <div className={cn(
-      "testimonial-card flex flex-col w-full",
+      "testimonial-card",
+      isLinkedInWithImage ? "aspect-auto" : "",
       className
     )}>
       <div className="flex flex-col flex-grow">

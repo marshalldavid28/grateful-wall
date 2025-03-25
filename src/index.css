@@ -104,6 +104,10 @@
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
 
+  .testimonial-masonry {
+    @apply grid-rows-[masonry] sm:grid-rows-[masonry];
+  }
+
   .btn-primary {
     @apply bg-primary text-primary-foreground rounded-full px-6 py-3 
            transition-all duration-300 shadow-sm
@@ -118,7 +122,7 @@
 
   .testimonial-card {
     @apply bg-white rounded-xl p-6 transition-all duration-300 border border-gray-100
-           hover:shadow-lg hover:-translate-y-1 flex flex-col h-auto;
+           hover:shadow-lg hover:-translate-y-1 flex flex-col h-full;
   }
 
   .chip {
@@ -182,5 +186,25 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Special handling for testimonial wall to create a more balanced layout */
+@supports (grid-template-rows: masonry) {
+  .testimonial-masonry {
+    grid-template-rows: masonry;
+    align-tracks: stretch;
+  }
+}
+
+/* Fallback for browsers that don't support masonry */
+@supports not (grid-template-rows: masonry) {
+  .testimonial-masonry {
+    @apply auto-rows-auto;
+  }
+  
+  .testimonial-masonry > div {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
   }
 }
