@@ -102,7 +102,7 @@ const Admin = () => {
       // Delete from Supabase
       await deleteTestimonial(id);
       
-      // Update local state manually in case realtime fails
+      // Update local state immediately for better UX
       setUserTestimonials(prevTestimonials => 
         prevTestimonials.filter(testimonial => testimonial.id !== id)
       );

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -29,6 +28,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent event from bubbling up
+    e.preventDefault();  // Add prevent default to ensure no form submissions
     
     if (confirmDelete) {
       console.log('Confirmed delete for testimonial ID:', id);
