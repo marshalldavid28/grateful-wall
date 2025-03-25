@@ -7,7 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Info, HelpCircle } from 'lucide-react';
 
 // Admin credentials (in a real app, these would be stored securely)
 const ADMIN_EMAIL = "admin@adtechademy.com";
@@ -153,13 +154,31 @@ const Login = () => {
           </form>
           
           <div className="mt-6 text-sm text-center">
-            <p className="mb-2 text-muted-foreground">
+            <p className="text-muted-foreground">
               This is a protected area. Only administrators can access this page.
             </p>
-            <div className="p-4 bg-muted/50 rounded-md">
-              <p className="font-medium mb-1">Demo Admin Credentials:</p>
-              <p className="text-xs">Email: {ADMIN_EMAIL}</p>
-              <p className="text-xs">Password: {ADMIN_PASSWORD}</p>
+            
+            <div className="mt-4">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                    <HelpCircle size={14} />
+                    Need help logging in?
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Admin Login Information</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      For admin access, please contact your system administrator.
+                      If you're a developer working on this project, check the README file for login instructions.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Close</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
