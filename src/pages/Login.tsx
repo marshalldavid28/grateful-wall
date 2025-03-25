@@ -27,30 +27,11 @@ const Login = () => {
 
     checkSession();
     
-    // Create or ensure admin user exists
-    const createAdminUser = async () => {
-      // Check if admin exists
-      const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
-      
-      if (userError || !userData) {
-        // Admin doesn't exist, create it
-        const { error } = await supabase.auth.admin.createUser({
-          email: ADMIN_EMAIL,
-          password: ADMIN_PASSWORD,
-          email_confirm: true
-        });
-        
-        if (error) {
-          console.error("Failed to create admin user:", error);
-        } else {
-          console.log("Admin user created successfully");
-        }
-      }
-    };
-    
-    // Note: This function won't work from the client side due to Supabase's security restrictions
-    // In a real app, this would be done through a secure backend process
+    // Note: In a production app, admin users should be created through 
+    // a secure backend process or the Supabase dashboard directly.
+    // The admin API methods are not available in the client-side SDK.
     // For this demo, we'll assume the admin user is created manually
+    // through the Supabase dashboard.
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
