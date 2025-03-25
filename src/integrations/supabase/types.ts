@@ -17,6 +17,7 @@ export type Database = {
           headline: string | null
           id: string
           image_url: string | null
+          linkedin_url: string | null
           name: string
           rating: number | null
           role: string | null
@@ -33,6 +34,7 @@ export type Database = {
           headline?: string | null
           id?: string
           image_url?: string | null
+          linkedin_url?: string | null
           name: string
           rating?: number | null
           role?: string | null
@@ -49,6 +51,7 @@ export type Database = {
           headline?: string | null
           id?: string
           image_url?: string | null
+          linkedin_url?: string | null
           name?: string
           rating?: number | null
           role?: string | null

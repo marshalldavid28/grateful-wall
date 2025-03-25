@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -21,7 +20,19 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   isAdmin = false,
   isDeleting = false
 }) => {
-  const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl, linkedinUrl } = testimonial;
+  const { 
+    id, 
+    name, 
+    avatarUrl, 
+    text, 
+    company, 
+    role, 
+    tags, 
+    type, 
+    headline, 
+    imageUrl, 
+    linkedinUrl 
+  } = testimonial;
   
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
@@ -49,7 +60,67 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
       }, 3000);
     }
   };
-  
+
+  // Render method for LinkedIn testimonial
+  const renderLinkedinTestimonial = () => (
+    <>
+      <div className="mb-3 flex items-center text-primary">
+        {linkedinUrl ? (
+          <a 
+            href={linkedinUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center hover:underline"
+          >
+            <Linkedin size={20} className="mr-2" />
+            <span className="text-sm font-medium">View LinkedIn Testimonial</span>
+            <ExternalLink size={14} className="ml-1" />
+          </a>
+        ) : (
+          <>
+            <Linkedin size={20} className="mr-2" />
+            <span className="text-sm font-medium">LinkedIn Testimonial</span>
+          </>
+        )}
+      </div>
+      
+      {headline && (
+        <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
+      )}
+      
+      {imageUrl && (
+        <div className="mb-4 rounded-md overflow-hidden border border-border relative group">
+          <img 
+            src={imageUrl} 
+            alt="LinkedIn testimonial" 
+            className="w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
+            onClick={() => setIsImagePreviewOpen(true)}
+          />
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="gap-1" 
+              onClick={() => setIsImagePreviewOpen(true)}
+            >
+              <ZoomIn size={16} />
+              View Full Image
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {imageUrl && (
+        <ImagePreviewPopup 
+          isOpen={isImagePreviewOpen}
+          onClose={() => setIsImagePreviewOpen(false)}
+          imageUrl={imageUrl}
+          alt={`${name}'s LinkedIn testimonial`}
+        />
+      )}
+    </>
+  );
+
   // Reset confirm state when clicking outside
   React.useEffect(() => {
     const resetConfirm = () => setConfirmDelete(false);
@@ -65,64 +136,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
       className
     )}>
       <div className="flex flex-col h-full">
-        {type === 'linkedin' ? (
-          <>
-            <div className="mb-3 flex items-center text-primary">
-              {linkedinUrl ? (
-                <a 
-                  href={linkedinUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:underline"
-                >
-                  <Linkedin size={20} className="mr-2" />
-                  <span className="text-sm font-medium">View LinkedIn Testimonial</span>
-                  <ExternalLink size={14} className="ml-1" />
-                </a>
-              ) : (
-                <>
-                  <Linkedin size={20} className="mr-2" />
-                  <span className="text-sm font-medium">LinkedIn Testimonial</span>
-                </>
-              )}
-            </div>
-            
-            {headline && (
-              <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
-            )}
-            
-            {imageUrl && (
-              <div className="mb-4 rounded-md overflow-hidden border border-border relative group">
-                <img 
-                  src={imageUrl} 
-                  alt="LinkedIn testimonial" 
-                  className="w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
-                  onClick={() => setIsImagePreviewOpen(true)}
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="gap-1" 
-                    onClick={() => setIsImagePreviewOpen(true)}
-                  >
-                    <ZoomIn size={16} />
-                    View Full Image
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {imageUrl && (
-              <ImagePreviewPopup 
-                isOpen={isImagePreviewOpen}
-                onClose={() => setIsImagePreviewOpen(false)}
-                imageUrl={imageUrl}
-                alt={`${name}'s LinkedIn testimonial`}
-              />
-            )}
-          </>
-        ) : (
+        {type === 'linkedin' ? renderLinkedinTestimonial() : (
           <>
             <div className="mb-4 text-primary">
               <Quote size={24} />
