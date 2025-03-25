@@ -2,7 +2,7 @@
 import React from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
-import { Quote } from 'lucide-react';
+import { Quote, Linkedin } from 'lucide-react';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -17,7 +17,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   onDelete,
   isAdmin = false
 }) => {
-  const { id, name, avatarUrl, text, company, role, tags } = testimonial;
+  const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl } = testimonial;
   
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   
@@ -40,12 +40,37 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   }, [confirmDelete]);
 
   return (
-    <div className={cn("testimonial-card flex flex-col h-full", className)}>      
-      <div className="mb-4 text-primary">
-        <Quote size={24} />
-      </div>
-      
-      <p className="text-foreground/80 mb-6 flex-grow line-clamp-6 sm:line-clamp-none">{text}</p>
+    <div className={cn("testimonial-card flex flex-col h-full", className)}>
+      {type === 'linkedin' ? (
+        <>
+          <div className="mb-3 flex items-center text-primary">
+            <Linkedin size={20} className="mr-2" />
+            <span className="text-sm font-medium">LinkedIn Testimonial</span>
+          </div>
+          
+          {headline && (
+            <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
+          )}
+          
+          {imageUrl && (
+            <div className="mb-4 rounded-md overflow-hidden border border-border">
+              <img 
+                src={imageUrl} 
+                alt="LinkedIn testimonial" 
+                className="w-full object-contain"
+              />
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="mb-4 text-primary">
+            <Quote size={24} />
+          </div>
+          
+          <p className="text-foreground/80 mb-6 flex-grow line-clamp-6 sm:line-clamp-none">{text}</p>
+        </>
+      )}
       
       <div className="flex flex-wrap items-center justify-between mt-auto">
         <div className="flex items-center">

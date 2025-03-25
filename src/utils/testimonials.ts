@@ -14,6 +14,8 @@ export interface Testimonial {
   source?: 'linkedin' | 'website' | 'email' | 'other';
   imageUrl?: string;
   tags?: string[];
+  type: 'written' | 'linkedin';
+  headline?: string;
 }
 
 // Default testimonials data for initial display if no stored testimonials exist
@@ -29,7 +31,8 @@ const defaultTestimonials: Testimonial[] = [
     date: new Date("2023-06-15"),
     verified: true,
     source: "linkedin",
-    tags: ["data science", "beginner friendly"]
+    tags: ["data science", "beginner friendly"],
+    type: "written"
   },
   {
     id: uuidv4(),
@@ -42,7 +45,8 @@ const defaultTestimonials: Testimonial[] = [
     date: new Date("2023-05-22"),
     verified: true,
     source: "website",
-    tags: ["marketing", "advanced"]
+    tags: ["marketing", "advanced"],
+    type: "written"
   },
   {
     id: uuidv4(),
@@ -55,7 +59,8 @@ const defaultTestimonials: Testimonial[] = [
     date: new Date("2023-07-03"),
     verified: true,
     source: "email",
-    tags: ["design", "intermediate"]
+    tags: ["design", "intermediate"],
+    type: "written"
   }
 ];
 

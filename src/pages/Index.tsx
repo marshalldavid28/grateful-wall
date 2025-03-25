@@ -6,6 +6,7 @@ import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
 import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
+import { TestimonialType } from '@/components/TestimonialTypeSelector';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
@@ -44,18 +45,39 @@ const Index = () => {
     company?: string;
     role?: string;
     image?: File;
+    type: TestimonialType;
+    headline?: string;
   }) => {
     try {
-      // Add the new testimonial, passing the current list to ensure we're not losing any
-      const newTestimonial = addTestimonial({
+      // Handle different testimonial types
+      const testimonialData: Partial<Testimonial> = {
         name: data.name,
-        text: data.text,
-        company: data.company,
-        role: data.role,
-        avatarUrl: data.image 
-          ? URL.createObjectURL(data.image) 
-          : undefined,
-      }, userTestimonials);
+        type: data.type,
+      };
+
+      if (data.type === 'written') {
+        testimonialData.text = data.text;
+        testimonialData.company = data.company;
+        testimonialData.role = data.role;
+        // Use the image as avatar for written testimonials
+        if (data.image) {
+          testimonialData.avatarUrl = URL.createObjectURL(data.image);
+        }
+      } else if (data.type === 'linkedin') {
+        // For LinkedIn testimonials, we use text for the headline content
+        testimonialData.text = data.headline || 'LinkedIn Testimonial';
+        testimonialData.headline = data.headline;
+        // Use the image as LinkedIn screenshot for linkedin testimonials
+        if (data.image) {
+          testimonialData.imageUrl = URL.createObjectURL(data.image);
+        }
+      }
+
+      // Add the new testimonial, passing the current list to ensure we're not losing any
+      const newTestimonial = addTestimonial(
+        testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'>, 
+        userTestimonials
+      );
 
       setUserTestimonials([newTestimonial, ...userTestimonials]);
       handleCloseModal();
