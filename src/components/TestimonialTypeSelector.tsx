@@ -25,7 +25,6 @@ export const TestimonialTypeSelector: React.FC<TestimonialTypeSelectorProps> = (
         <MessageSquare className="h-8 w-8 text-primary" />
         <div>
           <h3 className="font-semibold mb-1">Write a Testimonial</h3>
-          <p className="text-sm text-muted-foreground">Share your experience with Adtechademy</p>
         </div>
       </Button>
       
@@ -37,7 +36,6 @@ export const TestimonialTypeSelector: React.FC<TestimonialTypeSelectorProps> = (
         <Linkedin className="h-8 w-8 text-primary" />
         <div>
           <h3 className="font-semibold mb-1">Upload LinkedIn Screenshot</h3>
-          <p className="text-sm text-muted-foreground">Share a LinkedIn recommendation</p>
         </div>
       </Button>
     </div>
