@@ -7,11 +7,22 @@ import { getTestimonials, Testimonial, deleteTestimonial } from '@/utils/testimo
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Admin = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { toast: shadcnToast } = useToast();
   const navigate = useNavigate();
 
@@ -100,6 +111,8 @@ const Admin = () => {
       return; // Prevent multiple simultaneous delete operations
     }
     
+    setConfirmDelete(null);
+    
     try {
       setDeleteLoading(id);
       console.log('Deleting testimonial ID:', id);
@@ -121,6 +134,10 @@ const Admin = () => {
     } finally {
       setDeleteLoading(null);
     }
+  };
+
+  const openDeleteConfirm = (id: string) => {
+    setConfirmDelete(id);
   };
 
   const handleSignOut = async () => {
@@ -164,7 +181,6 @@ const Admin = () => {
           <h2 className="text-xl sm:text-2xl font-semibold mb-4">Manage Testimonials</h2>
           <p className="text-muted-foreground mb-6">
             You can delete any testimonial by clicking the trash icon on each card.
-            Click twice to confirm deletion.
           </p>
           
           {deleteLoading && (
@@ -177,7 +193,7 @@ const Admin = () => {
           {userTestimonials.length > 0 ? (
             <TestimonialWall 
               testimonials={userTestimonials} 
-              onDelete={handleDeleteTestimonial}
+              onDelete={openDeleteConfirm}
               isAdmin={true}
               deletingId={deleteLoading}
             />
@@ -188,6 +204,26 @@ const Admin = () => {
           )}
         </section>
       </main>
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this testimonial? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => confirmDelete && handleDeleteTestimonial(confirmDelete)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <footer className="border-t py-6 sm:py-8 px-4 sm:px-6 mt-8 sm:mt-12">
         <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
