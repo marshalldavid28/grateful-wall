@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -141,32 +142,31 @@ const addTestimonial = async (
   }
 };
 
-// Function to delete a testimonial
+// Function to delete a testimonial by ID
 const deleteTestimonial = async (id: string): Promise<boolean> => {
+  if (!id || typeof id !== 'string') {
+    console.error('Invalid testimonial ID:', id);
+    return false;
+  }
+
   try {
-    console.log(`Attempting to delete testimonial with ID: ${id}`);
+    console.log(`Deleting testimonial with ID: ${id}`);
     
-    if (!id) {
-      console.error('Invalid testimonial ID provided for deletion');
-      throw new Error('Invalid testimonial ID provided for deletion');
-    }
-    
-    // Execute the delete operation
     const { error } = await supabase
       .from('testimonials')
       .delete()
       .eq('id', id);
     
     if (error) {
-      console.error('Error deleting testimonial from Supabase:', error);
-      throw error;
+      console.error('Supabase delete error:', error);
+      return false;
     }
     
     console.log(`Successfully deleted testimonial with ID: ${id}`);
     return true;
   } catch (error) {
-    console.error('Error in deleteTestimonial:', error);
-    throw error;
+    console.error('Exception in deleteTestimonial:', error);
+    return false;
   }
 };
 

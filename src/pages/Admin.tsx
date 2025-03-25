@@ -19,6 +19,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
+        setLoading(true);
         const loadedTestimonials = await getTestimonials();
         setUserTestimonials(loadedTestimonials);
       } catch (error) {
@@ -95,33 +96,28 @@ const Admin = () => {
   }, [navigate]);
 
   const handleDeleteTestimonial = async (id: string) => {
+    if (!id || deleteLoading) {
+      return; // Prevent multiple simultaneous delete operations
+    }
+    
     try {
-      console.log('Delete initiated for testimonial ID:', id);
       setDeleteLoading(id);
+      console.log('Deleting testimonial ID:', id);
       
-      try {
-        // Attempt to delete from Supabase
-        const wasDeleted = await deleteTestimonial(id);
-        console.log(`Deletion result for ${id}: ${wasDeleted}`);
-        
-        if (wasDeleted) {
-          // Update local state immediately for better UX
-          setUserTestimonials(prevTestimonials => 
-            prevTestimonials.filter(testimonial => testimonial.id !== id)
-          );
-          
-          toast.success("Testimonial deleted successfully");
-        } else {
-          console.error(`Failed to delete testimonial with ID ${id}`);
-          toast.error("Failed to delete testimonial. Please try again.");
-        }
-      } catch (deleteError) {
-        console.error('Error from deletion API:', deleteError);
-        toast.error("Error during deletion. Please try again.");
+      const success = await deleteTestimonial(id);
+      
+      if (success) {
+        // Update UI immediately for better user experience
+        setUserTestimonials(prevTestimonials => 
+          prevTestimonials.filter(testimonial => testimonial.id !== id)
+        );
+        toast.success("Testimonial deleted successfully");
+      } else {
+        toast.error("Failed to delete testimonial. Please try again.");
       }
     } catch (error) {
-      console.error('Error in handleDeleteTestimonial:', error);
-      toast.error("Failed to process delete request. Please try again.");
+      console.error('Delete error:', error);
+      toast.error("Error deleting testimonial. Please try again.");
     } finally {
       setDeleteLoading(null);
     }
