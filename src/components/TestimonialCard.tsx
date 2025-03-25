@@ -52,7 +52,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
 
   return (
     <div className={cn(
-      "testimonial-card flex flex-col h-full",
+      "testimonial-card flex flex-col w-full",
       className
     )}>
       <div className="flex flex-col flex-grow">

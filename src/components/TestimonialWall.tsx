@@ -24,7 +24,7 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
       {testimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className="stagger-item h-full"
+          className="stagger-item"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           <TestimonialCard 
@@ -32,7 +32,6 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
             onDelete={onDelete}
             isAdmin={isAdmin}
             isDeleting={deletingId === testimonial.id}
-            className="h-full"
           />
         </div>
       ))}
