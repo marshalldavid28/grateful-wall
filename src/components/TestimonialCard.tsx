@@ -29,7 +29,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
         </div>
       )}
       
-      <div className="mb-4 text-primary/30">
+      <div className="mb-4 text-primary">
         <Quote size={24} />
       </div>
       
@@ -41,7 +41,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
             <img 
               src={avatarUrl} 
               alt={name} 
-              className="h-12 w-12 rounded-full object-cover border border-border"
+              className="h-12 w-12 rounded-full object-cover border border-muted"
             />
           </div>
         ) : (

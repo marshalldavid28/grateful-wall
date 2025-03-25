@@ -7,17 +7,17 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 0 0% 100%;
+    --foreground: 220 10% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 220 10% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+    --popover-foreground: 220 10% 20%;
 
-    --primary: 220 91% 54%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 358 87% 57%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14.3% 95.9%;
     --secondary-foreground: 220 8.9% 46.1%;
@@ -25,17 +25,17 @@
     --muted: 220 14.3% 95.9%;
     --muted-foreground: 220 8.9% 46.1%;
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 224 71.4% 4.1%;
+    --accent: 48 100% 50%;
+    --accent-foreground: 220 10% 20%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 224 71.4% 4.1%;
 
-    --radius: 1rem;
+    --radius: 1.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -118,17 +118,17 @@
   }
 
   .testimonial-card {
-    @apply glass rounded-2xl p-6 transition-all duration-300
+    @apply bg-white rounded-xl p-6 transition-all duration-300 border border-gray-100
            hover:shadow-lg hover:-translate-y-1;
   }
 
   .chip {
     @apply inline-flex items-center px-3 py-1 text-xs font-medium
-           rounded-full bg-secondary text-secondary-foreground;
+           rounded-full bg-accent text-accent-foreground;
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl lg:text-5xl font-display font-bold tracking-tight;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight;
   }
 
   .section-subtitle {
@@ -153,4 +153,15 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(var(--muted-foreground) / 0.5);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -61,7 +61,7 @@ const Index = () => {
             <div className="mb-2">
               <span className="chip">Wall of Gratitude</span>
             </div>
-            <h1 className="section-title mb-4">
+            <h1 className="section-title mb-4 text-[#333333]">
               Our Students' Success Stories
             </h1>
             <p className="section-subtitle mx-auto mb-8">
