@@ -21,19 +21,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   isAdmin = false,
   isDeleting = false
 }) => {
-  const { 
-    id, 
-    name, 
-    avatarUrl, 
-    text, 
-    company, 
-    role, 
-    tags, 
-    type, 
-    headline, 
-    imageUrl, 
-    linkedinUrl 
-  } = testimonial;
+  const { id } = testimonial;
   
   const [confirmDelete, setConfirmDelete] = useState(false);
   
@@ -41,7 +29,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     e.stopPropagation(); // Prevent event from bubbling up
     e.preventDefault();  // Add prevent default to ensure no form submissions
     
-    console.log('Delete button clicked for testimonial:', id, name);
+    console.log('Delete button clicked for testimonial:', id, testimonial.name);
     
     if (confirmDelete) {
       console.log('Confirmed delete for testimonial ID:', id);
@@ -76,23 +64,23 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
       className
     )}>
       <div className="flex flex-col h-full">
-        {type === 'linkedin' ? (
+        {testimonial.type === 'linkedin' ? (
           <LinkedinTestimonialContent 
-            headline={headline}
-            imageUrl={imageUrl}
-            linkedinUrl={linkedinUrl}
+            headline={testimonial.headline}
+            imageUrl={testimonial.imageUrl}
+            linkedinUrl={testimonial.linkedinUrl}
           />
         ) : (
-          <WrittenTestimonialContent text={text} />
+          <WrittenTestimonialContent text={testimonial.text} />
         )}
       </div>
       
       <TestimonialFooter 
-        name={name}
-        avatarUrl={avatarUrl}
-        role={role}
-        company={company}
-        tags={tags}
+        name={testimonial.name}
+        avatarUrl={testimonial.avatarUrl}
+        role={testimonial.role}
+        company={testimonial.company}
+        tags={testimonial.tags}
         isAdmin={isAdmin}
         isDeleting={isDeleting}
         confirmDelete={confirmDelete}
