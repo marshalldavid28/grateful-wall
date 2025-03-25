@@ -11,23 +11,31 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     <header className={cn("w-full sticky top-0 z-50 glass px-6 py-4", className)}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold font-display tracking-tight">
-            Adtechademy <span className="text-primary">Testimonials</span>
-          </h1>
+          <a href="https://adtechademy.com/" target="_blank" rel="noopener noreferrer">
+            <img 
+              src="/lovable-uploads/6e069cee-3f89-4e4f-8aeb-55b02249311c.png" 
+              alt="Adtechademy Logo" 
+              className="h-10 md:h-12"
+            />
+          </a>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-6">
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
+        <nav className="flex items-center space-x-6">
+          <a 
+            href="https://adtechademy.com/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
             Home
           </a>
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            Courses
-          </a>
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            About Us
-          </a>
-          <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            Contact
+          <a 
+            href="https://adtechademy.com/course/programmatic" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Our Course
           </a>
         </nav>
       </div>
