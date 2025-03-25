@@ -1,19 +1,12 @@
 
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { ImagePlus, X, ArrowLeft } from 'lucide-react';
-import { TestimonialTypeSelector, TestimonialType } from './TestimonialTypeSelector';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { TestimonialType } from './TestimonialTypeSelector';
+import { TestimonialSelectionStep } from './upload-modal/TestimonialSelectionStep';
+import { TestimonialFormHeader } from './upload-modal/TestimonialFormHeader';
+import { WrittenTestimonialForm } from './upload-modal/WrittenTestimonialForm';
+import { LinkedinTestimonialForm } from './upload-modal/LinkedinTestimonialForm';
+import { TestimonialFormFooter } from './upload-modal/TestimonialFormFooter';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -57,6 +50,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       };
       reader.readAsDataURL(selectedFile);
     }
+  };
+
+  const resetImage = () => {
+    setImage(null);
+    setPreview(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -106,212 +104,41 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         {step === 'select' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-display">Share Your Experience</DialogTitle>
-              <DialogDescription>
-                Choose how you'd like to share your experience with Adtechademy
-              </DialogDescription>
-            </DialogHeader>
-
-            <TestimonialTypeSelector onSelect={handleTypeSelect} className="my-6" />
-          </>
+          <TestimonialSelectionStep onSelect={handleTypeSelect} />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            <DialogHeader>
-              <div className="flex items-center">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={handleBackToSelect}
-                  className="mr-2 -ml-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <DialogTitle className="text-2xl font-display">
-                  {testimonialType === 'written' 
-                    ? 'Write Your Testimonial' 
-                    : 'Upload LinkedIn Screenshot'}
-                </DialogTitle>
-              </div>
-              <DialogDescription>
-                {testimonialType === 'written'
-                  ? "We'd love to hear about your journey with Adtechademy!"
-                  : "Share a screenshot of your LinkedIn recommendation for Adtechademy"}
-              </DialogDescription>
-            </DialogHeader>
+            <TestimonialFormHeader 
+              testimonialType={testimonialType!} 
+              onBack={handleBackToSelect} 
+            />
 
-            <div className="space-y-4 py-4">
-              <div>
-                <Label htmlFor="name">Your Name</Label>
-                <Input 
-                  id="name" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
-                  required
-                  className="mt-1"
-                />
-              </div>
+            {testimonialType === 'written' ? (
+              <WrittenTestimonialForm
+                name={name}
+                setName={setName}
+                text={text}
+                setText={setText}
+                company={company}
+                setCompany={setCompany}
+                role={role}
+                setRole={setRole}
+                preview={preview}
+                handleImageChange={handleImageChange}
+                resetImage={resetImage}
+              />
+            ) : (
+              <LinkedinTestimonialForm
+                name={name}
+                setName={setName}
+                headline={headline}
+                setHeadline={setHeadline}
+                preview={preview}
+                handleImageChange={handleImageChange}
+                resetImage={resetImage}
+              />
+            )}
 
-              {testimonialType === 'written' ? (
-                <div>
-                  <Label htmlFor="testimonial">Your Testimonial</Label>
-                  <Textarea
-                    id="testimonial"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Share how Adtechademy helped your career..."
-                    required
-                    className="mt-1 min-h-[100px]"
-                  />
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <Label htmlFor="headline">Headline or Quote</Label>
-                    <Input
-                      id="headline"
-                      value={headline}
-                      onChange={(e) => setHeadline(e.target.value)}
-                      placeholder="Add a headline for this testimonial"
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="linkedin-upload">LinkedIn Screenshot <span className="text-red-500">*</span></Label>
-                    <div className="mt-1">
-                      {preview ? (
-                        <div className="relative mt-2 mb-4">
-                          <img 
-                            src={preview} 
-                            alt="Preview" 
-                            className="h-64 w-full object-contain rounded-md border"
-                          />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setImage(null);
-                              setPreview(null);
-                            }}
-                            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center border-2 border-dashed border-border rounded-md p-6 mt-2">
-                          <label 
-                            htmlFor="linkedin-upload" 
-                            className="flex flex-col items-center cursor-pointer text-center"
-                          >
-                            <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
-                            <span className="text-sm text-muted-foreground">
-                              Click to upload LinkedIn screenshot
-                            </span>
-                            <input
-                              id="linkedin-upload"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageChange}
-                              required={testimonialType === 'linkedin'}
-                              className="sr-only"
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {testimonialType === 'written' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="company">Company</Label>
-                    <Input
-                      id="company"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Your Company"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="role">Role</Label>
-                    <Input
-                      id="role"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      placeholder="Your Position"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {testimonialType === 'written' && (
-                <div>
-                  <Label htmlFor="profile-upload">Profile Picture (Optional)</Label>
-                  <div className="mt-1">
-                    {preview ? (
-                      <div className="relative mt-2 mb-4">
-                        <img 
-                          src={preview} 
-                          alt="Preview" 
-                          className="h-48 w-48 object-cover rounded-full mx-auto"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setImage(null);
-                            setPreview(null);
-                          }}
-                          className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-destructive text-destructive-foreground rounded-full p-1"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center border-2 border-dashed border-border rounded-md p-6 mt-2">
-                        <label 
-                          htmlFor="profile-upload" 
-                          className="flex flex-col items-center cursor-pointer text-center"
-                        >
-                          <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
-                          <span className="text-sm text-muted-foreground">
-                            Click to upload profile picture
-                          </span>
-                          <input
-                            id="profile-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="sr-only"
-                          />
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button 
-                type="button" 
-                onClick={handleClose}
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Submit</Button>
-            </DialogFooter>
+            <TestimonialFormFooter onCancel={handleClose} />
           </form>
         )}
       </DialogContent>
