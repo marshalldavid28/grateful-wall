@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -154,12 +153,33 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
     // Log the exact query we're about to execute
     console.log(`Executing DELETE FROM testimonials WHERE id = '${id}'`);
     
-    // Execute the delete operation with explicit logging
-    const { error, count, data } = await supabase
+    // First, check if the testimonial exists
+    const { data: existingData, error: checkError } = await supabase
+      .from('testimonials')
+      .select('id')
+      .eq('id', id)
+      .single();
+    
+    if (checkError) {
+      console.error('Error checking if testimonial exists:', checkError);
+      // If the error is because the record doesn't exist, return false
+      if (checkError.code === 'PGRST116') {
+        console.log(`No testimonial found with ID: ${id}`);
+        return false;
+      }
+      throw checkError;
+    }
+    
+    if (!existingData) {
+      console.log(`No testimonial found with ID: ${id}`);
+      return false;
+    }
+    
+    // Execute the delete operation
+    const { error, count } = await supabase
       .from('testimonials')
       .delete()
-      .eq('id', id)
-      .select();
+      .eq('id', id);
     
     if (error) {
       console.error('Error deleting testimonial from Supabase:', error);
@@ -168,7 +188,7 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
     
     // Check if any rows were affected
     const wasDeleted = count !== null && count > 0;
-    console.log(`Deletion result for ID ${id}: Deleted=${wasDeleted}, Count=${count}, Data:`, data);
+    console.log(`Deletion result for ID ${id}: Deleted=${wasDeleted}, Count=${count}`);
     
     return wasDeleted;
   } catch (error) {

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -38,6 +37,11 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
       setConfirmDelete(false);
     } else {
       setConfirmDelete(true);
+      
+      // Auto-reset confirm state after 3 seconds
+      setTimeout(() => {
+        setConfirmDelete(false);
+      }, 3000);
     }
   };
   

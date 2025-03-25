@@ -103,6 +103,13 @@ const Admin = () => {
       const testimonialToDelete = userTestimonials.find(t => t.id === id);
       console.log('Attempting to delete testimonial:', testimonialToDelete);
       
+      if (!testimonialToDelete) {
+        console.error(`Testimonial with ID ${id} not found in local state`);
+        toast.error("Could not find testimonial to delete");
+        setDeleteLoading(null);
+        return;
+      }
+      
       // Delete from Supabase
       const wasDeleted = await deleteTestimonial(id);
       
@@ -114,7 +121,8 @@ const Admin = () => {
         
         toast.success("Testimonial deleted successfully");
       } else {
-        toast.error("No testimonial was deleted. It may have already been removed.");
+        console.error(`Failed to delete testimonial with ID ${id}`);
+        toast.error("Failed to delete testimonial. Please try again.");
       }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
