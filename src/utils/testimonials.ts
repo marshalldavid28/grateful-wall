@@ -1,79 +1,88 @@
 
+import { v4 as uuidv4 } from 'uuid';
+
 export interface Testimonial {
   id: string;
-  studentName: string;
-  imageUrl?: string; // LinkedIn screenshot or profile picture
-  text: string;
-  company?: string;
+  name: string;
   role?: string;
-  date: string;
-  course?: string;
+  company?: string;
+  text: string;
+  avatarUrl?: string;
+  rating?: number;
+  date: Date;
+  verified: boolean;
+  source?: 'linkedin' | 'website' | 'email' | 'other';
+  imageUrl?: string;
   featured?: boolean;
+  tags?: string[];
 }
 
-// Mock testimonials
-export const mockTestimonials: Testimonial[] = [
+// Mock testimonials data for initial display
+export const testimonials: Testimonial[] = [
   {
-    id: '1',
-    studentName: 'Alex Chen',
-    imageUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61',
-    text: 'Adtechademy completely transformed my career. I went from struggling with basic ad concepts to managing complex campaigns within months. The instructors truly care about your success!',
-    company: 'Digital MarketingPro',
-    role: 'Ad Operations Manager',
-    date: '2023-11-15',
-    course: 'Advanced Ad Operations',
-    featured: true
+    id: uuidv4(),
+    name: "Alex Johnson",
+    role: "Data Science Student",
+    company: "TechU",
+    text: "The Adtechademy course completely transformed my understanding of digital marketing. The instructors were incredibly knowledgeable and supportive throughout the entire journey.",
+    avatarUrl: "https://i.pravatar.cc/150?img=1",
+    rating: 5,
+    date: new Date("2023-06-15"),
+    verified: true,
+    source: "linkedin",
+    featured: true,
+    tags: ["data science", "beginner friendly"]
   },
   {
-    id: '2',
-    studentName: 'Sarah Johnson',
-    imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    text: 'The hands-on projects at Adtechademy gave me practical experience that immediately translated to my job. My team was impressed with my knowledge right away!',
-    company: 'MediaSolutions',
-    role: 'Ad Tech Specialist',
-    date: '2023-10-22',
-    course: 'Programmatic Fundamentals'
+    id: uuidv4(),
+    name: "Sarah Miller",
+    role: "Marketing Manager",
+    company: "CreativeStudio",
+    text: "I've taken several online courses before, but Adtechademy stands out for its practical approach and real-world applications. The community support is fantastic too!",
+    avatarUrl: "https://i.pravatar.cc/150?img=2",
+    rating: 4,
+    date: new Date("2023-05-22"),
+    verified: true,
+    source: "website",
+    tags: ["marketing", "advanced"]
   },
   {
-    id: '3',
-    studentName: 'Miguel Rodriguez',
-    imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-    text: 'I had tried other courses before, but nothing clicked until Adtechademy. The way they break down complex concepts makes everything so approachable.',
-    company: 'AdExchange Global',
-    role: 'Technical Product Manager',
-    date: '2023-09-18',
-    course: 'AdTech Architecture',
-    featured: true
-  },
-  {
-    id: '4',
-    studentName: 'Priya Patel',
-    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
-    text: 'The community at Adtechademy is incredibly supportive. Even after completing the course, I still keep in touch with my peers and instructors for advice.',
-    company: 'TechMedia Solutions',
-    role: 'Programmatic Specialist',
-    date: '2023-12-05',
-    course: 'Data Analytics for AdTech'
-  },
-  {
-    id: '5',
-    studentName: 'James Wilson',
-    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-    text: 'As someone from a non-technical background, I was worried about keeping up. Adtechademy's step-by-step approach made the transition into ad tech smooth and enjoyable.',
-    company: 'Digital First Agency',
-    role: 'Ad Operations Analyst',
-    date: '2023-08-30',
-    course: 'Ad Tech for Beginners'
-  },
-  {
-    id: '6',
-    studentName: 'Emma Davis',
-    imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2',
-    text: 'The ROI on this course is incredible. Within two months of graduating, I received a promotion and a 30% salary increase thanks to my new skills.',
-    company: 'MarketingTech Inc',
-    role: 'Senior Ad Operations',
-    date: '2024-01-10',
-    course: 'Campaign Management Mastery',
-    featured: true
+    id: uuidv4(),
+    name: "Michael Chen",
+    role: "Product Designer",
+    company: "DesignHub",
+    text: "Adtechademy helped me bridge the gap between design and marketing. The instructors present complex concepts in an accessible way that's easy to understand and apply.",
+    avatarUrl: "https://i.pravatar.cc/150?img=3",
+    rating: 5,
+    date: new Date("2023-07-03"),
+    verified: true,
+    source: "email",
+    featured: true,
+    tags: ["design", "intermediate"]
   }
 ];
+
+// Function to add a new testimonial
+export const addTestimonial = (testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'>): Testimonial => {
+  const newTestimonial: Testimonial = {
+    id: uuidv4(),
+    ...testimonial,
+    date: new Date(),
+    verified: false,
+  };
+  
+  // In a real application, you would persist this to a database
+  // For now, we'll just return the new testimonial
+  return newTestimonial;
+};
+
+// Function to get all testimonials
+export const getTestimonials = (): Testimonial[] => {
+  // In a real application, you would fetch this from an API or database
+  return testimonials;
+};
+
+// Function to get featured testimonials
+export const getFeaturedTestimonials = (): Testimonial[] => {
+  return testimonials.filter(testimonial => testimonial.featured);
+};
