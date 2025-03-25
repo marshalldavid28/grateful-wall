@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { TestimonialCard } from './TestimonialCard';
+import { TestimonialCard } from './testimonial-card/TestimonialCard';
 import { Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
 
