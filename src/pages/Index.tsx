@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
@@ -73,12 +72,6 @@ const Index = () => {
                 onClick={handleOpenModal} 
                 className="mx-auto"
               />
-              <Link 
-                to="/login" 
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                Admin Login
-              </Link>
             </div>
           </div>
         </section>

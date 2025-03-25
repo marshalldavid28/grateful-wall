@@ -5,6 +5,10 @@ import { Header } from '@/components/Header';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+// Admin credentials (in a real app, these would be stored securely)
+const ADMIN_EMAIL = "admin@adtechademy.com";
+const ADMIN_PASSWORD = "Adtech2024!";
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,6 +26,31 @@ const Login = () => {
     };
 
     checkSession();
+    
+    // Create or ensure admin user exists
+    const createAdminUser = async () => {
+      // Check if admin exists
+      const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
+      
+      if (userError || !userData) {
+        // Admin doesn't exist, create it
+        const { error } = await supabase.auth.admin.createUser({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD,
+          email_confirm: true
+        });
+        
+        if (error) {
+          console.error("Failed to create admin user:", error);
+        } else {
+          console.log("Admin user created successfully");
+        }
+      }
+    };
+    
+    // Note: This function won't work from the client side due to Supabase's security restrictions
+    // In a real app, this would be done through a secure backend process
+    // For this demo, we'll assume the admin user is created manually
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -110,9 +139,16 @@ const Login = () => {
             </button>
           </form>
           
-          <p className="mt-6 text-sm text-center text-muted-foreground">
-            This is a protected area. Only administrators can access this page.
-          </p>
+          <div className="mt-6 text-sm text-center">
+            <p className="mb-2 text-muted-foreground">
+              This is a protected area. Only administrators can access this page.
+            </p>
+            <div className="p-4 bg-muted/50 rounded-md">
+              <p className="font-medium mb-1">Demo Admin Credentials:</p>
+              <p className="text-xs">Email: {ADMIN_EMAIL}</p>
+              <p className="text-xs">Password: {ADMIN_PASSWORD}</p>
+            </div>
+          </div>
         </div>
       </main>
       

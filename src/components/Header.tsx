@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <img 
               src="/lovable-uploads/6e069cee-3f89-4e4f-8aeb-55b02249311c.png" 
               alt="Adtechademy Logo" 
-              className="h-8 md:h-10"
+              className="h-6 md:h-8" // Reduced size from h-8 md:h-10 to h-6 md:h-8
             />
           </a>
         </div>
