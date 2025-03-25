@@ -5,8 +5,6 @@ import { Input } from '@/components/ui/input';
 import { ImagePlus, X } from 'lucide-react';
 
 interface LinkedinTestimonialFormProps {
-  name: string;
-  setName: (value: string) => void;
   headline: string;
   setHeadline: (value: string) => void;
   linkedinUrl: string;
@@ -17,8 +15,6 @@ interface LinkedinTestimonialFormProps {
 }
 
 export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = ({
-  name,
-  setName,
   headline,
   setHeadline,
   linkedinUrl,
@@ -29,18 +25,6 @@ export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = (
 }) => {
   return (
     <div className="space-y-4 py-4">
-      <div>
-        <Label htmlFor="name">Your Name</Label>
-        <Input 
-          id="name" 
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="John Doe"
-          required
-          className="mt-1"
-        />
-      </div>
-
       <div>
         <Label htmlFor="headline">Headline or Quote</Label>
         <Input

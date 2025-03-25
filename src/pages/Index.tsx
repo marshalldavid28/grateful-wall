@@ -82,16 +82,17 @@ const Index = () => {
       setIsSubmitting(true);
       
       const testimonialData: Partial<Testimonial> & { image?: File } = {
-        name: data.name,
         type: data.type,
         image: data.image,
       };
 
       if (data.type === 'written') {
+        testimonialData.name = data.name;
         testimonialData.text = data.text;
         testimonialData.company = data.company;
         testimonialData.role = data.role;
       } else if (data.type === 'linkedin') {
+        testimonialData.name = 'LinkedIn User'; // Default name for LinkedIn testimonials
         testimonialData.text = data.headline || 'LinkedIn Testimonial';
         testimonialData.headline = data.headline;
         testimonialData.linkedinUrl = data.linkedinUrl;
