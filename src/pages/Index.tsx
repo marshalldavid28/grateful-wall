@@ -120,7 +120,7 @@ const Index = () => {
               <span className="chip">Wall of Gratitude</span>
             </div>
             <h1 className="section-title mb-4 text-[#333333] text-3xl sm:text-4xl md:text-5xl">
-              Our Students' Success Stories
+              Our Success Stories
             </h1>
             <p className="section-subtitle mx-auto mb-6 sm:mb-8 text-base sm:text-xl">
               Discover how Adtechademy has transformed careers and opened new opportunities
