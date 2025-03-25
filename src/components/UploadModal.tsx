@@ -66,7 +66,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     if (!testimonialType) return;
     
     onSubmit({
-      name: testimonialType === 'written' ? name : 'LinkedIn User', // Default name for LinkedIn testimonials
+      name,
       text,
       company,
       role,
@@ -135,6 +135,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               />
             ) : (
               <LinkedinTestimonialForm
+                name={name}
+                setName={setName}
                 headline={headline}
                 setHeadline={setHeadline}
                 linkedinUrl={linkedinUrl}
