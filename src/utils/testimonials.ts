@@ -154,26 +154,23 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
     console.log(`Executing DELETE FROM testimonials WHERE id = '${id}'`);
     
     // First, check if the testimonial exists
+    console.log(`Checking if testimonial with ID ${id} exists...`);
     const { data: existingData, error: checkError } = await supabase
       .from('testimonials')
       .select('id')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (checkError) {
       console.error('Error checking if testimonial exists:', checkError);
-      // If the error is because the record doesn't exist, return false
-      if (checkError.code === 'PGRST116') {
-        console.log(`No testimonial found with ID: ${id}`);
-        return false;
-      }
-      throw checkError;
+      return false;
     }
     
-    if (!existingData) {
+    if (!existingData || existingData.length === 0) {
       console.log(`No testimonial found with ID: ${id}`);
       return false;
     }
+    
+    console.log(`Testimonial found, proceeding with deletion. Data:`, existingData);
     
     // Execute the delete operation
     const { error, count } = await supabase

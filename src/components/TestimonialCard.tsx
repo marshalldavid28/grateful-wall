@@ -29,6 +29,8 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     e.stopPropagation(); // Prevent event from bubbling up
     e.preventDefault();  // Add prevent default to ensure no form submissions
     
+    console.log('Delete button clicked for testimonial:', id, name);
+    
     if (confirmDelete) {
       console.log('Confirmed delete for testimonial ID:', id);
       if (onDelete) {
@@ -37,6 +39,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
       setConfirmDelete(false);
     } else {
       setConfirmDelete(true);
+      console.log('Delete confirmation requested for:', id);
       
       // Auto-reset confirm state after 3 seconds
       setTimeout(() => {
