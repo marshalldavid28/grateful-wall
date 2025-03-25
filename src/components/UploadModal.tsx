@@ -1,12 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TestimonialType } from './TestimonialTypeSelector';
 import { TestimonialSelectionStep } from './upload-modal/TestimonialSelectionStep';
-import { TestimonialFormHeader } from './upload-modal/TestimonialFormHeader';
-import { WrittenTestimonialForm } from './upload-modal/WrittenTestimonialForm';
-import { LinkedinTestimonialForm } from './upload-modal/LinkedinTestimonialForm';
-import { TestimonialFormFooter } from './upload-modal/TestimonialFormFooter';
+import { TestimonialForm } from './upload-modal/TestimonialForm';
+import { useTestimonialForm } from '@/hooks/useTestimonialForm';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -29,123 +27,60 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   onSubmit,
   isSubmitting = false
 }) => {
-  const [step, setStep] = useState<'select' | 'form'>('select');
-  const [testimonialType, setTestimonialType] = useState<TestimonialType | null>(null);
+  const form = useTestimonialForm();
   
-  const [name, setName] = useState('');
-  const [text, setText] = useState('');
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [linkedinUrl, setLinkedinUrl] = useState('');
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setImage(selectedFile);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setPreview(event.target?.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-  };
-
-  const resetImage = () => {
-    setImage(null);
-    setPreview(null);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!testimonialType) return;
+    if (!form.testimonialType) return;
     
     onSubmit({
-      name,
-      text: testimonialType === 'linkedin' ? 'LinkedIn Testimonial' : text,
-      company,
-      role,
-      image: image || undefined,
-      type: testimonialType,
-      linkedinUrl: testimonialType === 'linkedin' ? linkedinUrl : undefined
+      name: form.name,
+      text: form.testimonialType === 'linkedin' ? 'LinkedIn Testimonial' : form.text,
+      company: form.company,
+      role: form.role,
+      image: form.image || undefined,
+      type: form.testimonialType,
+      linkedinUrl: form.testimonialType === 'linkedin' ? form.linkedinUrl : undefined
     });
-  };
-
-  const resetForm = () => {
-    setStep('select');
-    setTestimonialType(null);
-    setName('');
-    setText('');
-    setCompany('');
-    setRole('');
-    setLinkedinUrl('');
-    setImage(null);
-    setPreview(null);
   };
 
   const handleClose = () => {
     if (!isSubmitting) {
-      resetForm();
+      form.resetForm();
       onClose();
     }
-  };
-
-  const handleTypeSelect = (type: TestimonialType) => {
-    setTestimonialType(type);
-    setStep('form');
-  };
-
-  const handleBackToSelect = () => {
-    setStep('select');
-    setTestimonialType(null);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
-        {step === 'select' ? (
-          <TestimonialSelectionStep onSelect={handleTypeSelect} />
+        {form.step === 'select' ? (
+          <TestimonialSelectionStep onSelect={form.handleTypeSelect} />
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <TestimonialFormHeader 
-              testimonialType={testimonialType!} 
-              onBack={handleBackToSelect} 
-            />
-
-            {testimonialType === 'written' ? (
-              <WrittenTestimonialForm
-                name={name}
-                setName={setName}
-                text={text}
-                setText={setText}
-                company={company}
-                setCompany={setCompany}
-                role={role}
-                setRole={setRole}
-                preview={preview}
-                handleImageChange={handleImageChange}
-                resetImage={resetImage}
-              />
-            ) : (
-              <LinkedinTestimonialForm
-                name={name}
-                setName={setName}
-                linkedinUrl={linkedinUrl}
-                setLinkedinUrl={setLinkedinUrl}
-                preview={preview}
-                handleImageChange={handleImageChange}
-                resetImage={resetImage}
-              />
-            )}
-
-            <TestimonialFormFooter 
-              onCancel={handleClose} 
-              isSubmitting={isSubmitting}
-            />
-          </form>
+          <TestimonialForm
+            testimonialType={form.testimonialType!}
+            onBack={form.handleBackToSelect}
+            onCancel={handleClose}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            formState={{
+              name: form.name,
+              text: form.text,
+              company: form.company,
+              role: form.role,
+              linkedinUrl: form.linkedinUrl,
+              preview: form.preview
+            }}
+            formActions={{
+              setName: form.setName,
+              setText: form.setText,
+              setCompany: form.setCompany,
+              setRole: form.setRole,
+              setLinkedinUrl: form.setLinkedinUrl,
+              handleImageChange: form.handleImageChange,
+              resetImage: form.resetImage
+            }}
+          />
         )}
       </DialogContent>
     </Dialog>
