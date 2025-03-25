@@ -42,7 +42,8 @@
 /* Fallback for browsers that don't support masonry */
 @supports not (grid-template-rows: masonry) {
   .testimonial-masonry {
-    @apply auto-rows-auto;
+    display: grid;
+    grid-auto-rows: auto;
   }
   
   .testimonial-masonry > div {
