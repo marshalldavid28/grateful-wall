@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TestimonialCard } from './TestimonialCard';
 import { Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -21,17 +21,20 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
 }) => {
   // Function to arrange testimonials for a better visual layout
   const arrangeTestimonials = (testimonials: Testimonial[]) => {
-    // Sort testimonials to alternate between text and image types
-    // This helps create a more balanced visual layout
     return [...testimonials].sort((a, b) => {
-      // Put LinkedIn testimonials with images more evenly distributed
-      if (a.type === 'linkedin' && b.type !== 'linkedin') return 1;
-      if (b.type === 'linkedin' && a.type !== 'linkedin') return -1;
+      // First, sort by type to distribute different types of testimonials
+      if (a.type === 'linkedin' && b.type !== 'linkedin') return -1;
+      if (a.type !== 'linkedin' && b.type === 'linkedin') return 1;
       
-      // If both are LinkedIn, prefer ones with images
+      // For LinkedIn testimonials, prioritize ones with images
       if (a.type === 'linkedin' && b.type === 'linkedin') {
-        if (a.imageUrl && !b.imageUrl) return 1;
-        if (!a.imageUrl && b.imageUrl) return -1;
+        if (a.imageUrl && !b.imageUrl) return -1;
+        if (!a.imageUrl && b.imageUrl) return 1;
+      }
+      
+      // For written testimonials, sort by text length to balance visual layout
+      if (a.type === 'written' && b.type === 'written') {
+        return (b.text?.length || 0) - (a.text?.length || 0);
       }
       
       return 0;
@@ -42,14 +45,14 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
 
   return (
     <div className={cn(
-      "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto",
-      "testimonial-masonry",
+      "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+      "testimonial-grid",
       className
     )}>
       {arrangedTestimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className="stagger-item"
+          className="testimonial-item stagger-item"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           <TestimonialCard 

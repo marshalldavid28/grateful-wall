@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -50,15 +49,12 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
     }
   }, [confirmDelete]);
 
-  const isLinkedInWithImage = type === 'linkedin' && imageUrl;
-
   return (
     <div className={cn(
-      "testimonial-card",
-      isLinkedInWithImage ? "aspect-auto" : "",
+      "testimonial-card h-full",
       className
     )}>
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col h-full">
         {type === 'linkedin' ? (
           <>
             <div className="mb-3 flex items-center text-primary">
