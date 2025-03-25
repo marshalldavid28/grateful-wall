@@ -76,6 +76,7 @@ const Index = () => {
     image?: File;
     type: TestimonialType;
     headline?: string;
+    linkedinUrl?: string;
   }) => {
     try {
       setIsSubmitting(true);
@@ -93,6 +94,7 @@ const Index = () => {
       } else if (data.type === 'linkedin') {
         testimonialData.text = data.headline || 'LinkedIn Testimonial';
         testimonialData.headline = data.headline;
+        testimonialData.linkedinUrl = data.linkedinUrl;
       }
 
       const newTestimonial = await addTestimonial(

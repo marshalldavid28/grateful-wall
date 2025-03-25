@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
-import { Quote, Linkedin, ZoomIn } from 'lucide-react';
+import { Quote, Linkedin, ZoomIn, ExternalLink } from 'lucide-react';
 import { ImagePreviewPopup } from './ImagePreviewPopup';
 import { Button } from './ui/button';
 
@@ -21,7 +21,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   isAdmin = false,
   isDeleting = false
 }) => {
-  const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl } = testimonial;
+  const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl, linkedinUrl } = testimonial;
   
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
@@ -68,8 +68,23 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
         {type === 'linkedin' ? (
           <>
             <div className="mb-3 flex items-center text-primary">
-              <Linkedin size={20} className="mr-2" />
-              <span className="text-sm font-medium">LinkedIn Testimonial</span>
+              {linkedinUrl ? (
+                <a 
+                  href={linkedinUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center hover:underline"
+                >
+                  <Linkedin size={20} className="mr-2" />
+                  <span className="text-sm font-medium">View LinkedIn Testimonial</span>
+                  <ExternalLink size={14} className="ml-1" />
+                </a>
+              ) : (
+                <>
+                  <Linkedin size={20} className="mr-2" />
+                  <span className="text-sm font-medium">LinkedIn Testimonial</span>
+                </>
+              )}
             </div>
             
             {headline && (

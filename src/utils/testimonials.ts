@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -17,6 +16,7 @@ export interface Testimonial {
   tags?: string[];
   type: 'written' | 'linkedin';
   headline?: string;
+  linkedinUrl?: string;
 }
 
 // Helper function to convert File to base64 string
@@ -45,7 +45,8 @@ const mapSupabaseRecordToTestimonial = (record: any): Testimonial => {
     imageUrl: record.image_url || undefined,
     tags: record.tags || undefined,
     type: record.type as 'written' | 'linkedin',
-    headline: record.headline || undefined
+    headline: record.headline || undefined,
+    linkedinUrl: record.linkedin_url || undefined
   };
 };
 
@@ -63,7 +64,8 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
     image_url: testimonial.imageUrl,
     tags: testimonial.tags,
     type: testimonial.type,
-    headline: testimonial.headline
+    headline: testimonial.headline,
+    linkedin_url: testimonial.linkedinUrl
   };
 };
 

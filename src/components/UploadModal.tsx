@@ -20,6 +20,7 @@ interface UploadModalProps {
     image?: File;
     type: TestimonialType;
     headline?: string;
+    linkedinUrl?: string;
   }) => void;
 }
 
@@ -37,6 +38,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [headline, setHeadline] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -70,7 +72,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       role,
       image: image || undefined,
       type: testimonialType,
-      headline: testimonialType === 'linkedin' ? headline : undefined
+      headline: testimonialType === 'linkedin' ? headline : undefined,
+      linkedinUrl: testimonialType === 'linkedin' ? linkedinUrl : undefined
     });
   };
 
@@ -82,6 +85,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     setCompany('');
     setRole('');
     setHeadline('');
+    setLinkedinUrl('');
     setImage(null);
     setPreview(null);
   };
@@ -135,6 +139,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 setName={setName}
                 headline={headline}
                 setHeadline={setHeadline}
+                linkedinUrl={linkedinUrl}
+                setLinkedinUrl={setLinkedinUrl}
                 preview={preview}
                 handleImageChange={handleImageChange}
                 resetImage={resetImage}

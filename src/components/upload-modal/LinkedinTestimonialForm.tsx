@@ -9,6 +9,8 @@ interface LinkedinTestimonialFormProps {
   setName: (value: string) => void;
   headline: string;
   setHeadline: (value: string) => void;
+  linkedinUrl: string;
+  setLinkedinUrl: (value: string) => void;
   preview: string | null;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetImage: () => void;
@@ -19,6 +21,8 @@ export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = (
   setName,
   headline,
   setHeadline,
+  linkedinUrl,
+  setLinkedinUrl,
   preview,
   handleImageChange,
   resetImage,
@@ -45,6 +49,17 @@ export const LinkedinTestimonialForm: React.FC<LinkedinTestimonialFormProps> = (
           onChange={(e) => setHeadline(e.target.value)}
           placeholder="Add a headline for this testimonial"
           required
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="linkedin-url">LinkedIn Post URL</Label>
+        <Input
+          id="linkedin-url"
+          value={linkedinUrl}
+          onChange={(e) => setLinkedinUrl(e.target.value)}
+          placeholder="https://www.linkedin.com/feed/update/..."
           className="mt-1"
         />
       </div>
