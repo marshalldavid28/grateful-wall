@@ -20,11 +20,11 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
   deletingId = null
 }) => {
   return (
-    <div className={cn("testimonial-grid", className)}>
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto", className)}>
       {testimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className="stagger-item"
+          className="stagger-item h-full"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           <TestimonialCard 
@@ -32,6 +32,7 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
             onDelete={onDelete}
             isAdmin={isAdmin}
             isDeleting={deletingId === testimonial.id}
+            className="h-full"
           />
         </div>
       ))}

@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
 import { Quote, Linkedin, ZoomIn } from 'lucide-react';
 import { ImagePreviewPopup } from './ImagePreviewPopup';
 import { Button } from './ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -51,60 +51,65 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   }, [confirmDelete]);
 
   return (
-    <div className={cn("testimonial-card flex flex-col h-full", className)}>
-      {type === 'linkedin' ? (
-        <>
-          <div className="mb-3 flex items-center text-primary">
-            <Linkedin size={20} className="mr-2" />
-            <span className="text-sm font-medium">LinkedIn Testimonial</span>
-          </div>
-          
-          {headline && (
-            <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
-          )}
-          
-          {imageUrl && (
-            <div className="mb-4 rounded-md overflow-hidden border border-border relative group">
-              <img 
-                src={imageUrl} 
-                alt="LinkedIn testimonial" 
-                className="w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
-                onClick={() => setIsImagePreviewOpen(true)}
-              />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  className="gap-1" 
-                  onClick={() => setIsImagePreviewOpen(true)}
-                >
-                  <ZoomIn size={16} />
-                  View Full Image
-                </Button>
-              </div>
+    <div className={cn(
+      "testimonial-card flex flex-col h-full",
+      className
+    )}>
+      <div className="flex flex-col flex-grow">
+        {type === 'linkedin' ? (
+          <>
+            <div className="mb-3 flex items-center text-primary">
+              <Linkedin size={20} className="mr-2" />
+              <span className="text-sm font-medium">LinkedIn Testimonial</span>
             </div>
-          )}
-          
-          {imageUrl && (
-            <ImagePreviewPopup 
-              isOpen={isImagePreviewOpen}
-              onClose={() => setIsImagePreviewOpen(false)}
-              imageUrl={imageUrl}
-              alt={`${name}'s LinkedIn testimonial`}
-            />
-          )}
-        </>
-      ) : (
-        <>
-          <div className="mb-4 text-primary">
-            <Quote size={24} />
-          </div>
-          
-          <p className="text-foreground/80 mb-6 flex-grow line-clamp-6 sm:line-clamp-none">{text}</p>
-        </>
-      )}
+            
+            {headline && (
+              <p className="text-lg font-medium text-foreground mb-4">{headline}</p>
+            )}
+            
+            {imageUrl && (
+              <div className="mb-4 rounded-md overflow-hidden border border-border relative group">
+                <img 
+                  src={imageUrl} 
+                  alt="LinkedIn testimonial" 
+                  className="w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                  onClick={() => setIsImagePreviewOpen(true)}
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="gap-1" 
+                    onClick={() => setIsImagePreviewOpen(true)}
+                  >
+                    <ZoomIn size={16} />
+                    View Full Image
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {imageUrl && (
+              <ImagePreviewPopup 
+                isOpen={isImagePreviewOpen}
+                onClose={() => setIsImagePreviewOpen(false)}
+                imageUrl={imageUrl}
+                alt={`${name}'s LinkedIn testimonial`}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <div className="mb-4 text-primary">
+              <Quote size={24} />
+            </div>
+            
+            <p className="text-foreground/80 mb-6 flex-grow">{text}</p>
+          </>
+        )}
+      </div>
       
-      <div className="flex flex-wrap items-center justify-between mt-auto">
+      <div className="mt-auto pt-4 flex flex-wrap items-center justify-between">
         <div className="flex items-center">
           {avatarUrl ? (
             <div className="flex-shrink-0 mr-3">
