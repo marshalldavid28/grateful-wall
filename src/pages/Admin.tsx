@@ -15,23 +15,34 @@ const Admin = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      // Check for demo admin login first
-      const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
-      
-      if (isDemoAdmin) {
+      try {
+        // Check for demo admin login first
+        const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
+        
+        if (isDemoAdmin) {
+          setLoading(false);
+          return;
+        }
+        
+        // Check for regular Supabase session
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          navigate('/login');
+          return;
+        }
+        
+        if (!data.session) {
+          navigate('/login');
+          return;
+        }
+        
         setLoading(false);
-        return;
-      }
-      
-      // Check for regular Supabase session
-      const { data } = await supabase.auth.getSession();
-      
-      if (!data.session) {
+      } catch (error) {
+        console.error('Auth check error:', error);
         navigate('/login');
-        return;
       }
-      
-      setLoading(false);
     };
 
     checkSession();
@@ -48,12 +59,21 @@ const Admin = () => {
   };
 
   const handleSignOut = async () => {
-    // Clear demo admin login if exists
-    localStorage.removeItem('demoAdminLoggedIn');
-    
-    // Sign out from Supabase auth
-    await supabase.auth.signOut();
-    navigate('/login');
+    try {
+      // Clear demo admin login if exists
+      localStorage.removeItem('demoAdminLoggedIn');
+      
+      // Sign out from Supabase auth
+      await supabase.auth.signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {

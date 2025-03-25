@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 // Admin credentials (in a real app, these would be stored securely)
 const ADMIN_EMAIL = "admin@adtechademy.com";
@@ -13,11 +17,21 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
   
   useEffect(() => {
     const checkSession = async () => {
+      // Check for demo admin login
+      const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
+      
+      if (isDemoAdmin) {
+        navigate('/admin');
+        return;
+      }
+      
+      // Check for regular Supabase session
       const { data } = await supabase.auth.getSession();
       
       if (data.session) {
@@ -26,68 +40,64 @@ const Login = () => {
     };
 
     checkSession();
-    
-    // Note: In a production app, admin users should be created through 
-    // a secure backend process or the Supabase dashboard directly.
-    // The admin API methods are not available in the client-side SDK.
-    // For this demo, we'll assume the admin user is created manually
-    // through the Supabase dashboard.
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError('');
     
     if (!email || !password) {
-      toast({
-        title: "Error",
-        description: "Please enter both email and password.",
-        variant: "destructive",
-      });
+      setLoginError('Please enter both email and password.');
       return;
     }
     
     setLoading(true);
     
-    // Special case for demo admin login
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      // For demo purposes, we're bypassing actual authentication
-      // In a real application, never do this - always authenticate properly
-      setLoading(false);
+    try {
+      // Special case for demo admin login
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        // For demo purposes, we're bypassing actual authentication
+        setLoading(false);
+        
+        toast({
+          title: "Demo Login Successful",
+          description: "Welcome to the admin panel!",
+        });
+        
+        // Set a session flag for demo admin in localStorage
+        localStorage.setItem('demoAdminLoggedIn', 'true');
+        navigate('/admin');
+        return;
+      }
       
-      toast({
-        title: "Demo Login Successful",
-        description: "Welcome to the admin panel!",
+      // Regular Supabase authentication for non-demo credentials
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
       
-      // Set a session flag for demo admin in localStorage
-      localStorage.setItem('demoAdminLoggedIn', 'true');
-      navigate('/admin');
-      return;
-    }
-    
-    // Regular Supabase authentication for non-demo credentials
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    setLoading(false);
-    
-    if (error) {
+      if (error) {
+        throw error;
+      }
+      
+      if (data.user) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome to the admin panel!",
+        });
+        navigate('/admin');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setLoginError(error.message || 'Failed to sign in. Please check your credentials.');
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: error.message || 'Invalid login credentials',
         variant: "destructive",
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-    
-    toast({
-      title: "Login Successful",
-      description: "Welcome to the admin panel!",
-    });
-    
-    navigate('/admin');
   };
 
   return (
@@ -98,17 +108,22 @@ const Login = () => {
         <div className="max-w-md w-full p-8 border rounded-lg shadow-sm bg-card">
           <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
           
+          {loginError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{loginError}</AlertDescription>
+            </Alert>
+          )}
+          
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 Email
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter your email"
                 required
               />
@@ -118,24 +133,23 @@ const Login = () => {
               <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter your password"
                 required
               />
             </div>
             
-            <button
+            <Button
               type="submit"
-              className="w-full py-2 px-4 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className="w-full"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}
-            </button>
+            </Button>
           </form>
           
           <div className="mt-6 text-sm text-center">
