@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { TestimonialCard } from './testimonial-card/TestimonialCard';
+import { TestimonialCard } from './TestimonialCard';
 import { Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
 
@@ -57,10 +58,8 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
       {arrangedTestimonials.map((testimonial, index) => (
         <div 
           key={testimonial.id} 
-          className="testimonial-item stagger-item animate-float"
-          style={{ 
-            animationDelay: `${index * 0.1}s, ${1 + (index % 5) * 0.2}s`
-          }}
+          className="testimonial-item stagger-item"
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
           <TestimonialCard 
             testimonial={testimonial} 
