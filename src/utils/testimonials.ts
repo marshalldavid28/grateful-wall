@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -91,7 +92,7 @@ const getTestimonials = async (): Promise<Testimonial[]> => {
 };
 
 // Function to add a new testimonial
-export const addTestimonial = async (
+const addTestimonial = async (
   testimonial: Omit<Testimonial, 'id' | 'date' | 'verified'> & { 
     image?: File,
     id?: string,
@@ -142,7 +143,7 @@ export const addTestimonial = async (
 };
 
 // Function to delete a testimonial
-export const deleteTestimonial = async (id: string): Promise<void> => {
+const deleteTestimonial = async (id: string): Promise<void> => {
   try {
     console.log('Deleting testimonial with ID:', id);
     
