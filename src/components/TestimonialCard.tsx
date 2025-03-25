@@ -1,8 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
-import { Quote, Linkedin } from 'lucide-react';
+import { Quote, Linkedin, ZoomIn } from 'lucide-react';
+import { ImagePreviewPopup } from './ImagePreviewPopup';
+import { Button } from './ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -20,6 +23,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl } = testimonial;
   
   const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   
   const handleDeleteClick = () => {
     if (confirmDelete) {
@@ -53,13 +57,34 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
           )}
           
           {imageUrl && (
-            <div className="mb-4 rounded-md overflow-hidden border border-border">
+            <div className="mb-4 rounded-md overflow-hidden border border-border relative group">
               <img 
                 src={imageUrl} 
                 alt="LinkedIn testimonial" 
-                className="w-full object-contain"
+                className="w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                onClick={() => setIsImagePreviewOpen(true)}
               />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="gap-1" 
+                  onClick={() => setIsImagePreviewOpen(true)}
+                >
+                  <ZoomIn size={16} />
+                  View Full Image
+                </Button>
+              </div>
             </div>
+          )}
+          
+          {imageUrl && (
+            <ImagePreviewPopup 
+              isOpen={isImagePreviewOpen}
+              onClose={() => setIsImagePreviewOpen(false)}
+              imageUrl={imageUrl}
+              alt={`${name}'s LinkedIn testimonial`}
+            />
           )}
         </>
       ) : (
