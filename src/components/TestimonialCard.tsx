@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { type Testimonial } from '@/utils/testimonials';
 import { cn } from '@/lib/utils';
@@ -11,13 +12,15 @@ interface TestimonialCardProps {
   className?: string;
   onDelete?: (id: string) => void;
   isAdmin?: boolean;
+  isDeleting?: boolean;
 }
 
 export const TestimonialCard: React.FC<TestimonialCardProps> = ({ 
   testimonial, 
   className,
   onDelete,
-  isAdmin = false
+  isAdmin = false,
+  isDeleting = false
 }) => {
   const { id, name, avatarUrl, text, company, role, tags, type, headline, imageUrl } = testimonial;
   
@@ -141,15 +144,21 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
               "flex-shrink-0 transition-colors p-2 rounded-full",
               confirmDelete 
                 ? "bg-red-100 text-red-600 hover:bg-red-200" 
-                : "text-red-500 hover:text-red-700"
+                : "text-red-500 hover:text-red-700",
+              isDeleting && "opacity-50 cursor-not-allowed"
             )}
             aria-label={confirmDelete ? "Confirm delete" : "Delete testimonial"}
+            disabled={isDeleting}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18"></path>
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-            </svg>
+            {isDeleting ? (
+              <div className="animate-spin h-4 w-4 border-t-2 border-red-500 rounded-full" />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              </svg>
+            )}
           </button>
         )}
       </div>

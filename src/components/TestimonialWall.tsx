@@ -9,13 +9,15 @@ interface TestimonialWallProps {
   className?: string;
   onDelete?: (id: string) => void;
   isAdmin?: boolean;
+  deletingId?: string | null;
 }
 
 export const TestimonialWall: React.FC<TestimonialWallProps> = ({ 
   testimonials,
   className,
   onDelete,
-  isAdmin = false
+  isAdmin = false,
+  deletingId = null
 }) => {
   return (
     <div className={cn("testimonial-grid", className)}>
@@ -29,6 +31,7 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
             testimonial={testimonial} 
             onDelete={onDelete}
             isAdmin={isAdmin}
+            isDeleting={deletingId === testimonial.id}
           />
         </div>
       ))}

@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 const Admin = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const { toast: shadcnToast } = useToast();
   const navigate = useNavigate();
 
@@ -96,14 +96,13 @@ const Admin = () => {
 
   const handleDeleteTestimonial = async (id: string) => {
     try {
-      setDeleteLoading(true);
-      
+      setDeleteLoading(id);
       console.log('Attempting to delete testimonial with ID:', id);
       
       // Delete from Supabase
       await deleteTestimonial(id);
       
-      // Update local state (this actually shouldn't be necessary with realtime, but as a fallback)
+      // Update local state manually in case realtime fails
       setUserTestimonials(prevTestimonials => 
         prevTestimonials.filter(testimonial => testimonial.id !== id)
       );
@@ -113,7 +112,7 @@ const Admin = () => {
       console.error('Error deleting testimonial:', error);
       toast.error("Failed to delete testimonial. Please try again.");
     } finally {
-      setDeleteLoading(false);
+      setDeleteLoading(null);
     }
   };
 
@@ -164,7 +163,7 @@ const Admin = () => {
           {deleteLoading && (
             <div className="mb-4 p-2 bg-muted/50 rounded flex items-center gap-2">
               <div className="animate-spin h-4 w-4 border-t-2 border-primary rounded-full"></div>
-              <span className="text-sm">Processing...</span>
+              <span className="text-sm">Deleting testimonial...</span>
             </div>
           )}
           
@@ -173,6 +172,7 @@ const Admin = () => {
               testimonials={userTestimonials} 
               onDelete={handleDeleteTestimonial}
               isAdmin={true}
+              deletingId={deleteLoading}
             />
           ) : (
             <div className="text-center py-12 border border-dashed rounded-lg">
