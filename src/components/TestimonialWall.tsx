@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TestimonialCard } from './TestimonialCard';
 import { Testimonial } from '@/utils/testimonials';
@@ -60,9 +59,8 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
           key={testimonial.id} 
           className="testimonial-item stagger-item animate-float"
           style={{ 
-            animationDelay: `${index * 0.1}s`,
-            // Add a different float animation delay for each card to create a wave effect
-            animationDelay: `${1 + (index % 5) * 0.2}s`
+            // Stagger the fade-in animation
+            animationDelay: `${index * 0.1}s, ${1 + (index % 5) * 0.2}s`
           }}
         >
           <TestimonialCard 
