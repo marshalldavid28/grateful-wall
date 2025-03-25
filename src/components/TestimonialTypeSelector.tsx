@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LinkedIn, MessageSquare } from 'lucide-react';
+import { Linkedin, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type TestimonialType = 'written' | 'linkedin';
@@ -34,7 +34,7 @@ export const TestimonialTypeSelector: React.FC<TestimonialTypeSelectorProps> = (
         variant="outline" 
         className="h-auto flex flex-col items-center justify-center gap-3 p-6 text-center hover:bg-background/80 hover:border-primary"
       >
-        <LinkedIn className="h-8 w-8 text-primary" />
+        <Linkedin className="h-8 w-8 text-primary" />
         <div>
           <h3 className="font-semibold mb-1">Upload LinkedIn Screenshot</h3>
           <p className="text-sm text-muted-foreground">Share a screenshot of your LinkedIn recommendation</p>
