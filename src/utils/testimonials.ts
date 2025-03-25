@@ -123,36 +123,11 @@ export const getTestimonials = async (): Promise<Testimonial[]> => {
     
     if (error) {
       console.error('Error fetching testimonials from Supabase:', error);
-      // Fall back to default testimonials
-      return defaultTestimonials;
+      return [];
     }
     
-    // If we have data but it's empty and this is first time, seed with default testimonials
+    // Simply return empty array if no testimonials found
     if (data && data.length === 0) {
-      // Check if we should seed the database
-      const shouldSeed = localStorage.getItem('testimonials_seeded') !== 'true';
-      
-      if (shouldSeed) {
-        // Seed the database with default testimonials
-        for (const testimonial of defaultTestimonials) {
-          await addTestimonial(testimonial);
-        }
-        localStorage.setItem('testimonials_seeded', 'true');
-        
-        // Fetch again after seeding
-        const { data: seededData, error: seededError } = await supabase
-          .from('testimonials')
-          .select('*')
-          .order('date', { ascending: false });
-          
-        if (seededError) {
-          console.error('Error fetching seeded testimonials:', seededError);
-          return defaultTestimonials;
-        }
-        
-        return (seededData || []).map(mapSupabaseRecordToTestimonial);
-      }
-      
       return [];
     }
     
@@ -160,7 +135,7 @@ export const getTestimonials = async (): Promise<Testimonial[]> => {
     return (data || []).map(mapSupabaseRecordToTestimonial);
   } catch (error) {
     console.error('Error in getTestimonials:', error);
-    return defaultTestimonials;
+    return [];
   }
 };
 
@@ -234,6 +209,19 @@ export const deleteTestimonial = async (id: string): Promise<void> => {
     console.log(`Successfully deleted ${count} testimonial(s) with ID: ${id}`);
   } catch (error) {
     console.error('Error in deleteTestimonial:', error);
+    throw error;
+  }
+};
+
+// Add helper function to manually seed the database if needed (no auto-seeding)
+export const seedDefaultTestimonials = async (): Promise<void> => {
+  try {
+    for (const testimonial of defaultTestimonials) {
+      await addTestimonial(testimonial);
+    }
+    console.log('Default testimonials seeded successfully');
+  } catch (error) {
+    console.error('Error seeding default testimonials:', error);
     throw error;
   }
 };

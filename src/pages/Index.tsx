@@ -4,17 +4,19 @@ import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
 import { AddTestimonialButton } from '@/components/AddTestimonialButton';
 import { UploadModal } from '@/components/UploadModal';
-import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, addTestimonial, seedDefaultTestimonials } from '@/utils/testimonials';
 import { useToast } from '@/components/ui/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const { toast: shadcnToast } = useToast();
 
   // Load testimonials on component mount
@@ -68,6 +70,29 @@ const Index = () => {
   const handleCloseModal = () => {
     if (!isSubmitting) {
       setIsModalOpen(false);
+    }
+  };
+
+  const handleSeedTestimonials = async () => {
+    if (userTestimonials.length > 0) {
+      if (!window.confirm('There are already testimonials in the database. Are you sure you want to add example testimonials?')) {
+        return;
+      }
+    }
+    
+    try {
+      setIsSeeding(true);
+      await seedDefaultTestimonials();
+      toast.success("Example testimonials added successfully!");
+      
+      // Refresh the testimonials
+      const refreshedTestimonials = await getTestimonials();
+      setUserTestimonials(refreshedTestimonials);
+    } catch (error) {
+      console.error('Error seeding testimonials:', error);
+      toast.error("Failed to add example testimonials.");
+    } finally {
+      setIsSeeding(false);
     }
   };
 
@@ -140,6 +165,16 @@ const Index = () => {
                 onClick={handleOpenModal} 
                 className="mx-auto"
               />
+              {userTestimonials.length === 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handleSeedTestimonials}
+                  disabled={isSeeding}
+                  className="mx-auto"
+                >
+                  {isSeeding ? 'Adding examples...' : 'Add example testimonials'}
+                </Button>
+              )}
             </div>
           </div>
         </section>
