@@ -96,8 +96,8 @@ const Admin = () => {
 
   const handleDeleteTestimonial = async (id: string) => {
     try {
+      console.log('Delete initiated for testimonial ID:', id);
       setDeleteLoading(id);
-      console.log('Attempting to delete testimonial with ID:', id);
       
       // Delete from Supabase
       await deleteTestimonial(id);

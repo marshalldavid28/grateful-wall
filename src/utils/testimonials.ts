@@ -145,14 +145,14 @@ const addTestimonial = async (
 // Function to delete a testimonial
 const deleteTestimonial = async (id: string): Promise<void> => {
   try {
-    console.log('Attempting to delete testimonial with ID:', id);
+    console.log('Starting deletion process for testimonial with ID:', id);
     
     if (!id) {
       throw new Error('Invalid testimonial ID provided for deletion');
     }
     
-    // Use `eq` to explicitly match the ID - this ensures it uses the correct ID format
-    const { error } = await supabase
+    // Execute the delete operation
+    const { error, count } = await supabase
       .from('testimonials')
       .delete()
       .eq('id', id);
@@ -162,7 +162,7 @@ const deleteTestimonial = async (id: string): Promise<void> => {
       throw error;
     }
     
-    console.log(`Successfully deleted testimonial with ID: ${id}`);
+    console.log(`Successfully deleted testimonial with ID: ${id}, affected rows: ${count}`);
   } catch (error) {
     console.error('Error in deleteTestimonial:', error);
     throw error;
