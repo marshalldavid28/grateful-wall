@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -12,6 +11,7 @@ export interface Testimonial {
   rating?: number;
   date: Date;
   verified: boolean;
+  approved: boolean;
   source?: 'linkedin' | 'website' | 'email' | 'other';
   imageUrl?: string;
   tags?: string[];
@@ -41,6 +41,7 @@ const mapSupabaseRecordToTestimonial = (record: any): Testimonial => {
     rating: record.rating || undefined,
     date: new Date(record.date),
     verified: record.verified,
+    approved: record.approved || false,
     source: record.source as any || undefined,
     imageUrl: record.image_url || undefined,
     tags: record.tags || undefined,
@@ -59,6 +60,7 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
     avatar_url: testimonial.avatarUrl,
     rating: testimonial.rating,
     verified: testimonial.verified || false,
+    approved: testimonial.approved ?? false,
     source: testimonial.source,
     image_url: testimonial.imageUrl,
     tags: testimonial.tags,
@@ -67,20 +69,21 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
   };
 };
 
-const getTestimonials = async (): Promise<Testimonial[]> => {
+const getTestimonials = async (isAdmin: boolean = false): Promise<Testimonial[]> => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('testimonials')
       .select('*')
       .order('date', { ascending: false });
     
-    if (error) {
-      console.error('Error fetching testimonials from Supabase:', error);
-      return [];
+    if (!isAdmin) {
+      query = query.eq('approved', true);
     }
     
-    // Simply return empty array if no testimonials found
-    if (data && data.length === 0) {
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching testimonials from Supabase:', error);
       return [];
     }
     
@@ -170,4 +173,24 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
   }
 };
 
-export { getTestimonials, addTestimonial, deleteTestimonial };
+// Function to update testimonial approval status
+const updateTestimonialApproval = async (id: string, approved: boolean): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('testimonials')
+      .update({ approved })
+      .eq('id', id);
+    
+    if (error) {
+      console.error('Error updating testimonial approval:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Exception in updateTestimonialApproval:', error);
+    return false;
+  }
+};
+
+export { getTestimonials, addTestimonial, deleteTestimonial, updateTestimonialApproval };

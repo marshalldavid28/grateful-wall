@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { UploadModal } from '@/components/UploadModal';
 import { getTestimonials, Testimonial, addTestimonial } from '@/utils/testimonials';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { TestimonialType } from '@/components/TestimonialTypeSelector';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +22,8 @@ const Index = () => {
     const fetchTestimonials = async () => {
       try {
         setIsLoading(true);
-        const loadedTestimonials = await getTestimonials();
+        // Fetch only approved testimonials for public view
+        const loadedTestimonials = await getTestimonials(false);
         setUserTestimonials(loadedTestimonials);
       } catch (error) {
         console.error('Error loading testimonials:', error);
@@ -34,6 +35,7 @@ const Index = () => {
 
     fetchTestimonials();
 
+    // Subscribe to changes, but only show approved testimonials
     const testimonialsChannel = supabase
       .channel('testimonials-changes')
       .on('postgres_changes', 
@@ -44,7 +46,7 @@ const Index = () => {
         }, 
         async () => {
           try {
-            const refreshedTestimonials = await getTestimonials();
+            const refreshedTestimonials = await getTestimonials(false);
             setUserTestimonials(refreshedTestimonials);
           } catch (error) {
             console.error('Error refreshing testimonials:', error);

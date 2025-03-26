@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { TestimonialWall } from '@/components/TestimonialWall';
-import { getTestimonials, Testimonial, deleteTestimonial } from '@/utils/testimonials';
+import { getTestimonials, Testimonial, deleteTestimonial, updateTestimonialApproval } from '@/utils/testimonials';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,10 +22,10 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [approvalLoading, setApprovalLoading] = useState<string | null>(null);
   const { toast: shadcnToast } = useToast();
   const navigate = useNavigate();
 
-  // Load testimonials on component mount
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
@@ -43,7 +42,6 @@ const Admin = () => {
 
     fetchTestimonials();
 
-    // Subscribe to changes in the testimonials table
     const testimonialsChannel = supabase
       .channel('admin-testimonials-changes')
       .on('postgres_changes', 
@@ -53,7 +51,6 @@ const Admin = () => {
           table: 'testimonials' 
         }, 
         async () => {
-          // Refresh testimonials when changes are detected
           try {
             const refreshedTestimonials = await getTestimonials();
             setUserTestimonials(refreshedTestimonials);
@@ -65,7 +62,6 @@ const Admin = () => {
       .subscribe();
 
     return () => {
-      // Unsubscribe from the channel when the component unmounts
       supabase.removeChannel(testimonialsChannel);
     };
   }, []);
@@ -74,7 +70,6 @@ const Admin = () => {
     const checkSession = async () => {
       try {
         setLoading(true);
-        // Check for demo admin login first
         const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
         
         if (isDemoAdmin) {
@@ -82,7 +77,6 @@ const Admin = () => {
           return;
         }
         
-        // Check for regular Supabase session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -108,19 +102,17 @@ const Admin = () => {
 
   const handleDeleteTestimonial = async (id: string) => {
     if (!id || deleteLoading) {
-      return; // Prevent multiple simultaneous delete operations
+      return;
     }
     
     setConfirmDelete(null);
     
     try {
       setDeleteLoading(id);
-      console.log('Deleting testimonial ID:', id);
       
       const success = await deleteTestimonial(id);
       
       if (success) {
-        // Update UI immediately for better user experience
         setUserTestimonials(prevTestimonials => 
           prevTestimonials.filter(testimonial => testimonial.id !== id)
         );
@@ -136,16 +128,43 @@ const Admin = () => {
     }
   };
 
+  const handleApproveTestimonial = async (id: string, approve: boolean) => {
+    if (!id || approvalLoading) {
+      return;
+    }
+    
+    try {
+      setApprovalLoading(id);
+      
+      const success = await updateTestimonialApproval(id, approve);
+      
+      if (success) {
+        setUserTestimonials(prevTestimonials => 
+          prevTestimonials.map(testimonial => 
+            testimonial.id === id 
+              ? { ...testimonial, approved: approve }
+              : testimonial
+          )
+        );
+        toast.success(`Testimonial ${approve ? 'approved' : 'unapproved'} successfully`);
+      } else {
+        toast.error(`Failed to ${approve ? 'approve' : 'unapprove'} testimonial. Please try again.`);
+      }
+    } catch (error) {
+      console.error('Approval error:', error);
+      toast.error("Error updating testimonial approval. Please try again.");
+    } finally {
+      setApprovalLoading(null);
+    }
+  };
+
   const openDeleteConfirm = (id: string) => {
     setConfirmDelete(id);
   };
 
   const handleSignOut = async () => {
     try {
-      // Clear demo admin login if exists
       localStorage.removeItem('demoAdminLoggedIn');
-      
-      // Sign out from Supabase auth
       await supabase.auth.signOut();
       navigate('/login');
     } catch (error) {
@@ -180,13 +199,15 @@ const Admin = () => {
         <section className="mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold mb-4">Manage Testimonials</h2>
           <p className="text-muted-foreground mb-6">
-            You can delete any testimonial by clicking the trash icon on each card.
+            You can approve, delete, or modify testimonials from this panel.
           </p>
           
-          {deleteLoading && (
+          {(deleteLoading || approvalLoading) && (
             <div className="mb-4 p-2 bg-muted/50 rounded flex items-center gap-2">
               <div className="animate-spin h-4 w-4 border-t-2 border-primary rounded-full"></div>
-              <span className="text-sm">Deleting testimonial...</span>
+              <span className="text-sm">
+                {deleteLoading ? 'Deleting testimonial...' : 'Updating testimonial approval...'}
+              </span>
             </div>
           )}
           
@@ -194,8 +215,10 @@ const Admin = () => {
             <TestimonialWall 
               testimonials={userTestimonials} 
               onDelete={openDeleteConfirm}
+              onApprove={handleApproveTestimonial}
               isAdmin={true}
               deletingId={deleteLoading}
+              approvingId={approvalLoading}
             />
           ) : (
             <div className="text-center py-12 border border-dashed rounded-lg">

@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       testimonials: {
         Row: {
+          approved: boolean | null
           avatar_url: string | null
           company: string | null
           date: string
@@ -28,6 +29,7 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          approved?: boolean | null
           avatar_url?: string | null
           company?: string | null
           date?: string
@@ -45,6 +47,7 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          approved?: boolean | null
           avatar_url?: string | null
           company?: string | null
           date?: string

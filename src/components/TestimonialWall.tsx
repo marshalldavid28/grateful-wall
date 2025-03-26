@@ -8,16 +8,20 @@ interface TestimonialWallProps {
   testimonials: Testimonial[];
   className?: string;
   onDelete?: (id: string) => void;
+  onApprove?: (id: string, approve: boolean) => void;
   isAdmin?: boolean;
   deletingId?: string | null;
+  approvingId?: string | null;
 }
 
 export const TestimonialWall: React.FC<TestimonialWallProps> = ({ 
   testimonials,
   className,
   onDelete,
+  onApprove,
   isAdmin = false,
-  deletingId = null
+  deletingId = null,
+  approvingId = null
 }) => {
   // Function to arrange testimonials for a better visual layout
   const arrangeTestimonials = (testimonials: Testimonial[]) => {
@@ -64,8 +68,10 @@ export const TestimonialWall: React.FC<TestimonialWallProps> = ({
           <TestimonialCard 
             testimonial={testimonial} 
             onDelete={onDelete}
+            onApprove={onApprove}
             isAdmin={isAdmin}
             isDeleting={deletingId === testimonial.id}
+            isApproving={approvingId === testimonial.id}
           />
         </div>
       ))}
