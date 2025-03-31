@@ -13,6 +13,7 @@ import { PageFooter } from '@/components/PageFooter';
 
 const Index = () => {
   const [userTestimonials, setUserTestimonials] = useState<Testimonial[]>([]);
+  const [pendingTestimonials, setPendingTestimonials] = useState<Testimonial[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,6 +61,16 @@ const Index = () => {
     };
   }, []);
 
+  // Clear pending testimonials if they get approved and appear in the main list
+  useEffect(() => {
+    if (pendingTestimonials.length > 0 && userTestimonials.length > 0) {
+      const approvedIds = userTestimonials.map(t => t.id);
+      setPendingTestimonials(prevPending => 
+        prevPending.filter(pending => !approvedIds.includes(pending.id))
+      );
+    }
+  }, [userTestimonials, pendingTestimonials]);
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -101,10 +112,12 @@ const Index = () => {
         testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }
       );
 
-      setUserTestimonials([newTestimonial, ...userTestimonials]);
+      // Add the new testimonial to the pending list since it's not approved yet
+      setPendingTestimonials(prev => [newTestimonial, ...prev]);
+      
       handleCloseModal();
       
-      toast.success("Testimonial submitted successfully!");
+      toast.success("Thank you! Your testimonial has been submitted and is pending approval.");
     } catch (error) {
       console.error('Error submitting testimonial:', error);
       toast.error("Failed to submit testimonial. Please try again.");
@@ -113,6 +126,9 @@ const Index = () => {
     }
   };
 
+  // Combine approved testimonials with pending ones for display
+  const allTestimonials = [...userTestimonials, ...pendingTestimonials];
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -120,9 +136,17 @@ const Index = () => {
       <main className="flex-grow px-4 sm:px-6 py-8 sm:py-12 md:py-20 max-w-7xl mx-auto w-full">
         <HeroSection onOpenModal={handleOpenModal} />
         <TestimonialSection 
-          testimonials={userTestimonials}
+          testimonials={allTestimonials}
           isLoading={isLoading}
         />
+        
+        {pendingTestimonials.length > 0 && (
+          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-md">
+            <p className="text-amber-800 text-sm">
+              Your testimonial has been submitted and is awaiting approval. It will be visible to others once approved.
+            </p>
+          </div>
+        )}
       </main>
 
       <PageFooter />

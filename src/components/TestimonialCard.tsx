@@ -6,7 +6,7 @@ import { LinkedinTestimonialContent } from './testimonial/LinkedinTestimonialCon
 import { WrittenTestimonialContent } from './testimonial/WrittenTestimonialContent';
 import { UserInfo } from './testimonial/UserInfo';
 import { DeleteButton } from './testimonial/DeleteButton';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, ClockIcon } from 'lucide-react';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -54,8 +54,19 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
   };
 
   return (
-    <div className={cn("testimonial-card", className)}>
+    <div className={cn(
+      "testimonial-card",
+      !approved && !isAdmin && "border-amber-200 bg-amber-50/50",
+      className
+    )}>
       <div className="flex flex-col h-full">
+        {!approved && !isAdmin && (
+          <div className="mb-3 flex items-center text-amber-600 text-sm">
+            <ClockIcon className="h-4 w-4 mr-1.5" />
+            <span>Pending approval</span>
+          </div>
+        )}
+        
         {type === 'linkedin' ? (
           <LinkedinTestimonialContent
             linkedinUrl={linkedinUrl}
