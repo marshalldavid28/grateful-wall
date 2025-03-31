@@ -1,20 +1,35 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 
 interface AdminHeaderProps {
   onSignOut: () => void;
+  pendingCount?: number;
 }
 
-export const AdminHeader: React.FC<AdminHeaderProps> = ({ onSignOut }) => {
+export const AdminHeader: React.FC<AdminHeaderProps> = ({ 
+  onSignOut,
+  pendingCount = 0
+}) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-12">
-      <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
-      <button 
-        onClick={onSignOut}
-        className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-      >
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b pb-6">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your application content and settings
+          {pendingCount > 0 && (
+            <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+              {pendingCount} pending approval
+            </span>
+          )}
+        </p>
+      </div>
+      
+      <Button variant="outline" onClick={onSignOut}>
+        <LogOut className="h-4 w-4 mr-2" />
         Sign Out
-      </button>
+      </Button>
     </div>
   );
 };

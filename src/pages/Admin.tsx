@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -169,12 +168,15 @@ const Admin = () => {
     return <FullPageLoader />;
   }
 
+  // Count of pending testimonials
+  const pendingCount = userTestimonials.filter(t => !t.approved).length;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-grow px-4 sm:px-6 py-8 sm:py-12 md:py-20 max-w-7xl mx-auto w-full">
-        <AdminHeader onSignOut={handleSignOut} />
+        <AdminHeader onSignOut={handleSignOut} pendingCount={pendingCount} />
 
         <TestimonialsSection
           userTestimonials={userTestimonials}
