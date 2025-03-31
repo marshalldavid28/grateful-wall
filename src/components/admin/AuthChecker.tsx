@@ -19,6 +19,7 @@ export const AuthChecker: React.FC<AuthCheckerProps> = ({ children }) => {
         const isDemoAdmin = localStorage.getItem('demoAdminLoggedIn') === 'true';
         
         if (isDemoAdmin) {
+          console.log('User is authenticated via demo mode');
           setIsAuthenticated(true);
           setLoading(false);
           return;
@@ -33,10 +34,12 @@ export const AuthChecker: React.FC<AuthCheckerProps> = ({ children }) => {
         }
         
         if (!data.session) {
+          console.log('No session found, redirecting to login');
           navigate('/login');
           return;
         }
         
+        console.log('User is authenticated via Supabase');
         setIsAuthenticated(true);
         setLoading(false);
       } catch (error) {

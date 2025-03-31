@@ -154,7 +154,7 @@ const addTestimonial = async (
   }
 };
 
-// Function to delete a testimonial by ID
+// Function to delete a testimonial by ID - FIXED to directly delete from Supabase
 const deleteTestimonial = async (id: string): Promise<boolean> => {
   if (!id || typeof id !== 'string') {
     console.error('Invalid testimonial ID:', id);
@@ -182,24 +182,22 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
   }
 };
 
-// Function to update testimonial approval status
+// Function to update testimonial approval status - FIXED to directly update in Supabase
 const updateTestimonialApproval = async (id: string, approved: boolean): Promise<boolean> => {
   try {
     console.log(`Updating testimonial approval status. ID: ${id}, Approved: ${approved}`);
     
-    const { error, data } = await supabase
+    const { error } = await supabase
       .from('testimonials')
       .update({ approved })
-      .eq('id', id)
-      .select('*')
-      .single();
+      .eq('id', id);
     
     if (error) {
       console.error('Error updating testimonial approval:', error);
       return false;
     }
     
-    console.log('Successfully updated testimonial approval status:', data);
+    console.log(`Successfully updated testimonial approval status for ID: ${id} to ${approved}`);
     return true;
   } catch (error) {
     console.error('Exception in updateTestimonialApproval:', error);

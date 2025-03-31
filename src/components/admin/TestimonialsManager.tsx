@@ -44,17 +44,16 @@ export const TestimonialsManager: React.FC<TestimonialsManagerProps> = ({ onUpda
 
     // Subscribe to changes in the testimonials table
     const testimonialsChannel = supabase
-      .channel('admin-testimonials-manager-changes')
+      .channel('admin-testimonials-changes')
       .on('postgres_changes', 
         { 
           event: '*', 
           schema: 'public', 
           table: 'testimonials' 
         }, 
-        async (payload) => {
+        (payload) => {
           console.log('TestimonialsManager: Received real-time update:', payload);
-          // Refresh the entire testimonial list on any change
-          await fetchTestimonials();
+          fetchTestimonials();
         }
       )
       .subscribe();
@@ -78,11 +77,8 @@ export const TestimonialsManager: React.FC<TestimonialsManagerProps> = ({ onUpda
       const success = await deleteTestimonial(id);
       
       if (success) {
-        // Remove from local state to update UI immediately
-        setUserTestimonials(prevTestimonials => 
-          prevTestimonials.filter(testimonial => testimonial.id !== id)
-        );
         toast.success("Testimonial deleted successfully");
+        // We don't need to update local state as the real-time subscription will handle this
       } else {
         toast.error("Failed to delete testimonial. Please try again.");
       }
@@ -105,15 +101,8 @@ export const TestimonialsManager: React.FC<TestimonialsManagerProps> = ({ onUpda
       const success = await updateTestimonialApproval(id, approve);
       
       if (success) {
-        // Update local state to reflect the change immediately
-        setUserTestimonials(prevTestimonials => 
-          prevTestimonials.map(testimonial => 
-            testimonial.id === id 
-              ? { ...testimonial, approved: approve }
-              : testimonial
-          )
-        );
         toast.success(`Testimonial ${approve ? 'approved' : 'unapproved'} successfully`);
+        // We don't need to update local state as the real-time subscription will handle this
       } else {
         toast.error(`Failed to ${approve ? 'approve' : 'unapprove'} testimonial. Please try again.`);
       }
