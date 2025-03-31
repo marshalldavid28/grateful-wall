@@ -19,21 +19,23 @@ const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast: shadcnToast } = useToast();
 
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        setIsLoading(true);
-        // Fetch only approved testimonials for public view
-        const loadedTestimonials = await getTestimonials(false);
-        setUserTestimonials(loadedTestimonials);
-      } catch (error) {
-        console.error('Error loading testimonials:', error);
-        toast.error("Error loading testimonials. Please refresh the page.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchTestimonials = async () => {
+    try {
+      console.log('Index: Fetching approved testimonials');
+      setIsLoading(true);
+      // Pass false to only get approved testimonials for public view
+      const loadedTestimonials = await getTestimonials(false);
+      setUserTestimonials(loadedTestimonials);
+      console.log(`Index: Fetched ${loadedTestimonials.length} approved testimonials`);
+    } catch (error) {
+      console.error('Error loading testimonials:', error);
+      toast.error("Error loading testimonials. Please refresh the page.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTestimonials();
 
     // Subscribe to changes, but only show approved testimonials
@@ -45,18 +47,16 @@ const Index = () => {
           schema: 'public', 
           table: 'testimonials' 
         }, 
-        async () => {
-          try {
-            const refreshedTestimonials = await getTestimonials(false);
-            setUserTestimonials(refreshedTestimonials);
-          } catch (error) {
-            console.error('Error refreshing testimonials:', error);
-          }
+        async (payload) => {
+          console.log('Index: Received real-time update:', payload);
+          // Reload all approved testimonials
+          await fetchTestimonials();
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Index: Cleaning up subscription');
       supabase.removeChannel(testimonialsChannel);
     };
   }, []);
@@ -108,10 +108,15 @@ const Index = () => {
         testimonialData.linkedinUrl = data.linkedinUrl;
       }
 
+      // Mark as not approved by default
+      testimonialData.approved = false;
+
       const newTestimonial = await addTestimonial(
         testimonialData as Omit<Testimonial, 'id' | 'date' | 'verified'> & { image?: File }
       );
 
+      console.log('New testimonial submitted:', newTestimonial);
+      
       // Add the new testimonial to the pending list since it's not approved yet
       setPendingTestimonials(prev => [newTestimonial, ...prev]);
       

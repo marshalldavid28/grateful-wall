@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -69,14 +70,19 @@ const mapTestimonialToSupabaseRecord = (testimonial: Partial<Testimonial>) => {
   };
 };
 
+// Get testimonials from Supabase with appropriate filtering
 const getTestimonials = async (isAdmin: boolean = false): Promise<Testimonial[]> => {
   try {
+    console.log(`Fetching testimonials, isAdmin: ${isAdmin}`);
+    
     let query = supabase
       .from('testimonials')
       .select('*')
       .order('date', { ascending: false });
     
+    // Only filter by approval status for non-admin views
     if (!isAdmin) {
+      console.log('Filtering for only approved testimonials');
       query = query.eq('approved', true);
     }
     
@@ -87,6 +93,7 @@ const getTestimonials = async (isAdmin: boolean = false): Promise<Testimonial[]>
       return [];
     }
     
+    console.log(`Fetched ${data?.length || 0} testimonials from Supabase`);
     return (data || []).map(mapSupabaseRecordToTestimonial);
   } catch (error) {
     console.error('Error in getTestimonials:', error);
@@ -137,6 +144,8 @@ const addTestimonial = async (
       throw error;
     }
     
+    console.log('Successfully added testimonial:', data);
+    
     // Return the newly created testimonial
     return mapSupabaseRecordToTestimonial(data);
   } catch (error) {
@@ -176,16 +185,21 @@ const deleteTestimonial = async (id: string): Promise<boolean> => {
 // Function to update testimonial approval status
 const updateTestimonialApproval = async (id: string, approved: boolean): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    console.log(`Updating testimonial approval status. ID: ${id}, Approved: ${approved}`);
+    
+    const { error, data } = await supabase
       .from('testimonials')
       .update({ approved })
-      .eq('id', id);
+      .eq('id', id)
+      .select('*')
+      .single();
     
     if (error) {
       console.error('Error updating testimonial approval:', error);
       return false;
     }
     
+    console.log('Successfully updated testimonial approval status:', data);
     return true;
   } catch (error) {
     console.error('Exception in updateTestimonialApproval:', error);

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -17,22 +18,26 @@ const Admin = () => {
   const [approvalLoading, setApprovalLoading] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        setLoading(true);
-        const loadedTestimonials = await getTestimonials();
-        setUserTestimonials(loadedTestimonials);
-      } catch (error) {
-        console.error('Error loading testimonials:', error);
-        toast.error("Error loading testimonials. Please refresh the page.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchTestimonials = async () => {
+    try {
+      console.log('Admin: Fetching testimonials');
+      setLoading(true);
+      // Pass true to get ALL testimonials for admin view
+      const loadedTestimonials = await getTestimonials(true);
+      setUserTestimonials(loadedTestimonials);
+      console.log(`Admin: Fetched ${loadedTestimonials.length} testimonials`);
+    } catch (error) {
+      console.error('Error loading testimonials:', error);
+      toast.error("Error loading testimonials. Please refresh the page.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTestimonials();
 
+    // Subscribe to changes in the testimonials table
     const testimonialsChannel = supabase
       .channel('admin-testimonials-changes')
       .on('postgres_changes', 
@@ -41,18 +46,16 @@ const Admin = () => {
           schema: 'public', 
           table: 'testimonials' 
         }, 
-        async () => {
-          try {
-            const refreshedTestimonials = await getTestimonials();
-            setUserTestimonials(refreshedTestimonials);
-          } catch (error) {
-            console.error('Error refreshing testimonials:', error);
-          }
+        async (payload) => {
+          console.log('Admin: Received real-time update:', payload);
+          // Refresh the entire testimonial list on any change
+          await fetchTestimonials();
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Admin: Cleaning up subscription');
       supabase.removeChannel(testimonialsChannel);
     };
   }, []);
@@ -104,6 +107,7 @@ const Admin = () => {
       const success = await deleteTestimonial(id);
       
       if (success) {
+        // Remove from local state to update UI immediately
         setUserTestimonials(prevTestimonials => 
           prevTestimonials.filter(testimonial => testimonial.id !== id)
         );
@@ -130,6 +134,7 @@ const Admin = () => {
       const success = await updateTestimonialApproval(id, approve);
       
       if (success) {
+        // Update local state to reflect the change immediately
         setUserTestimonials(prevTestimonials => 
           prevTestimonials.map(testimonial => 
             testimonial.id === id 
